@@ -1,7 +1,7 @@
 // src/app/services/gemini-chat.service.ts
 import { Injectable, signal } from '@angular/core';
 import { GoogleGenAI } from '@google/genai';
-
+import { environment } from '../../../src/environments/environment.development';
 export interface ChatMessage {
   sender: 'user' | 'gemini';
   text: string;
@@ -12,7 +12,7 @@ export interface ChatMessage {
 })
 export class GeminiChatService {
   // Replace with your Google AI Studio API Key (https://aistudio.google.com/)
-  private readonly apiKey = '';
+  private readonly apiKey = environment.geminiApiKey;
   private readonly ai = new GoogleGenAI({ apiKey: this.apiKey });
 
   // System instruction to restrict and focus topics on women's wellness
