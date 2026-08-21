@@ -12,7 +12,7 @@ export interface ChatMessage {
 })
 export class GeminiChatService {
   // Replace with your Google AI Studio API Key (https://aistudio.google.com/)
-  private readonly apiKey = 'AQ.Ab8RN6KaVpyJ2gOOp24Ml69KYcoO6r2DjT8m5YWiOh044CTHvw';
+  private readonly apiKey = '';
   private readonly ai = new GoogleGenAI({ apiKey: this.apiKey });
 
   // System instruction to restrict and focus topics on women's wellness
