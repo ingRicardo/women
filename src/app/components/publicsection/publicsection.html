@@ -1,0 +1,48 @@
+  
+  @if (role === 'ADMIN') {
+  
+  <div class="public-header">
+    <h3>
+      Welcome, {{ username }}!
+    </h3>
+       <button (click)="goToAdminSection()">Go to Admin Section</button>
+       <button (click)="logout()">logout</button>
+
+  </div>
+
+}@else if (role === 'USER' || role === 'user' || role === 'User') {
+  <div class="public-header"> 
+    <h3>Welcome, {{ username }}!</h3>
+    <button (click)="logout()">logout</button>
+  </div>
+  
+}
+<app-imagecarouselv1 [images]="slides"></app-imagecarouselv1>
+
+<!-- Dynamic horizontal gallery -->
+<div class="gallery-container">
+  @for (race of races(); track race.id) {
+    <div 
+      class="card" 
+      [class.selected]="selectedRace()?.id === race.id"
+      (click)="selectRace(race)"
+    >
+      <img [src]="race.image" [alt]="race.name + ' Woman'" />
+      <span>{{ race.name }}</span>
+    </div>
+  }
+</div>
+<!-- Description display panel -->
+@if (selectedRace(); as race) {
+  <div class="description-card">
+    <div class="description-header">
+      <h4>{{ race.name }} Heritage & Culture</h4>
+      <button class="close-btn" (click)="selectedRace.set(null)">✕</button>
+    </div>
+    <p>{{ race.description }}</p>
+  </div>
+}
+
+ <app-woman-list></app-woman-list>
+ 
+<app-wellness-chatbot class="component"></app-wellness-chatbot>

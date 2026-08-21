@@ -1,0 +1,36 @@
+.tabs-header {
+  display: flex;
+  border-bottom: 2px solid #e0e0e0;
+  gap: 8px;
+}
+
+button {
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  color: #edeff3;
+}
+
+button.active {
+  border-bottom-color: #1976d2;
+  color: #1976d2;
+}
+
+.tab-panel {
+  padding: 16px 0;
+}
+
+.card-image-container {
+  position: relative;
+  width: 646px;
+  height: 500px;
+}
+.tab-header-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}

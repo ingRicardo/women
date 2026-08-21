@@ -1,0 +1,20 @@
+<div class="carousel-container">
+      @if (images().length > 0) {
+        <div class="slide">
+          <img [src]="images()[currentIndex()]" [alt]="'Slide ' + (currentIndex() + 1)" />
+        </div>
+
+        <button class="nav-btn prev" (click)="prev()">&lsaquo;</button>
+        <button class="nav-btn next" (click)="next()">&rsaquo;</button>
+
+        <div class="indicators">
+          @for (img of images(); track $index) {
+            <span 
+              class="dot" 
+              [class.active]="$index === currentIndex()" 
+              (click)="goToIndex($index)">
+            </span>
+          }
+        </div>
+      }
+    </div>

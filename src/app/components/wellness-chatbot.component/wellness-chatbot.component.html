@@ -1,0 +1,42 @@
+<!-- src/app/components/wellness-chatbot/wellness-chatbot.component.html -->
+
+<!-- Floating Chat Toggle Button -->
+<button class="chat-toggle-btn" (click)="toggleChat()">
+  💬 Women's Wellness AI
+</button>
+
+<!-- Floating Chat Drawer / Window -->
+<div class="chat-window" *ngIf="isOpen()">
+  <div class="chat-header">
+    <h3>Beauty & Health Assistant</h3>
+    <button class="close-btn" (click)="toggleChat()">✕</button>
+  </div>
+
+  <div class="chat-messages">
+    <div 
+      *ngFor="let msg of chatService.messages()" 
+      [ngClass]="{'msg-user': msg.sender === 'user', 'msg-gemini': msg.sender === 'gemini'}"
+      class="message-bubble"
+    >
+      <div class="message-text">{{ msg.text }}</div>
+    </div>
+
+    <div *ngIf="chatService.isLoading()" class="message-bubble msg-gemini loading">
+      <span>Typing response...</span>
+    </div>
+  </div>
+
+  <div class="chat-input-area">
+    <input 
+      type="text" 
+      [ngModel]="userQuery()" 
+      (ngModelChange)="userQuery.set($event)"
+      (keyup.enter)="handleSend()"
+      placeholder="Ask about skincare, workout tips, nutrition..."
+      [disabled]="chatService.isLoading()"
+    />
+    <button (click)="handleSend()" [disabled]="chatService.isLoading() || !userQuery().trim()">
+      Send
+    </button>
+  </div>
+</div>

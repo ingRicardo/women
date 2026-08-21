@@ -1,0 +1,370 @@
+button {
+  padding: 0.75rem 1.5rem;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+button:hover {
+  background-color: #357ae8;
+}
+button:active {
+  background-color: #2a65c8;
+}
+main {
+    background-color: #201e1e;
+}
+
+.public-header {
+  display: flex;
+  align-items: center; /* Centers elements vertically along the same line */
+  gap: 1rem; /* Adds even spacing between heading and buttons */
+}
+
+/* Optional: Removes top/bottom margins on the <h3> so it aligns flush with buttons */
+.public-header h3 {
+  margin: 0;
+}
+
+.gallery-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.gallery-container .card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.gallery-container img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* Hover effect */
+.gallery-container .card:hover img {
+  transform: scale(1.08) translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Selected image state */
+.gallery-container .card.selected img {
+  border-color: #007bff;
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.gallery-container .card.selected span {
+  color: #007bff;
+  font-weight: bold;
+}
+
+/* Description Card Styling */
+.description-card {
+  max-width: 600px;
+  margin: 1.5rem auto;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-left: 5px solid #007bff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.description-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.description-header h4 {
+  margin: 0;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+.description-card p {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.card-container {
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      border-radius: 12px;
+      background-color: #f9f9f9;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: #4f46e5;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    .action-btn:hover {
+      background-color: #4338ca;
+    }
+
+    .race-card {
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+
+    .image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .details {
+      padding: 1.25rem;
+    }
+
+    .details h3 {
+      margin: 0 0 0.5rem 0;
+      color: #111827;
+    }
+
+    .details p {
+      color: #4b5563;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 1.25rem;
+    }
+
+    .rating-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f3f4f6;
+    }
+
+    .rating-section label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #374151;
+    }
+
+    .rating-section input {
+      padding: 0.5rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 1rem;
+      width: 100px;
+    }
+
+
+.submit-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #10b981;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #059669;
+    }
+
+    .rating-badge {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .placeholder-text {
+      text-align: center;
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    .ranshowcase{
+      color: #030215;
+    }
+
+    /* Modal Popup Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      animation: popIn 0.2s ease-out;
+    }
+
+    .modal-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-content h3 {
+      margin: 0 0 0.5rem 0;
+      color: #111827;
+    }
+
+    .modal-content p {
+      color: #4b5563;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 0.6rem;
+      background-color: #4f46e5;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-btn:hover {
+      background-color: #4338ca;
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+/* Grid for display of all races with ratings */
+    .races-rating-grid {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .races-rating-grid h3 {
+      margin-bottom: 1rem;
+      color: #1f2937;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 1rem;
+    }
+
+    .grid-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid-card img {
+      width: 100%;
+      height: 500px;
+      object-fit: cover;
+    }
+
+    .grid-card-info {
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .grid-card-info h4 {
+      margin: 0;
+      font-size: 1rem;
+      color: #111827;
+    }
+
+    .rate-tag {
+      font-size: 0.875rem;
+      color: #4b5563;
+      background-color: #f3f4f6;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin-top: 0.25rem;
+    }

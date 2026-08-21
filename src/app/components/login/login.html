@@ -1,0 +1,174 @@
+<div class="main">
+
+@if (isRegistering()) {
+<!-- REGISTER FORM -->
+    <p>Register</p>
+
+    <form (submit)="onRegisterSubmit($event)">
+      <!-- Name Field -->
+      <div>
+        <label>
+          Name:
+          <input type="text" [formField]="registerForm.name" />
+        </label>
+        @if (registerForm.name().touched() && registerForm.name().invalid()) {
+          <ul class="error-list">
+            @for (error of registerForm.name().errors(); track error) {
+              <li>{{ error.message }}</li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Username Field -->
+      <div>
+        <label>
+          Username:
+          <input type="text" [formField]="registerForm.user" />
+        </label>
+        @if (registerForm.user().touched() && registerForm.user().invalid()) {
+          <ul class="error-list">
+            @for (error of registerForm.user().errors(); track error) {
+              <li>{{ error.message }}</li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Password Field -->
+      <div>
+        <label>
+          Password:
+          <input type="password" [formField]="registerForm.password" />
+        </label>
+        @if (registerForm.password().touched() && registerForm.password().invalid()) {
+          <ul class="error-list">
+            @for (error of registerForm.password().errors(); track error) {
+              <li>{{ error.message }}</li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Role Field -->
+      <div>
+        <label>
+          Role:
+          <select [formField]="registerForm.role">
+            <option value="" disabled selected>Select a role</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </label>
+        @if (registerForm.role().touched() && registerForm.role().invalid()) {
+          <ul class="error-list">
+            @for (error of registerForm.role().errors(); track error) {
+              <li>{{ error.message }}</li>
+            }
+          </ul>
+        }
+      </div>
+      <!-- Email Field -->
+      <div>
+        <label>
+          Email:
+          <input type="email" [formField]="registerForm.email" />
+        </label>
+        @if (registerForm.email().touched() && registerForm.email().invalid()) {
+          <ul class="error-list">
+            @for (error of registerForm.email().errors(); track error) {
+              <li>{{ error.message }}</li>
+            }
+          </ul>
+        }
+      </div>
+
+<!-- STYLED SUCCESS ALERT -->
+    @if (successMessage()) {
+      <div class="alert alert-success" role="alert">
+        <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+        </svg>
+        <div class="alert-content">
+          <span class="alert-title">Success</span>
+          <p class="alert-message">{{ successMessage() }}</p>
+        </div>
+        <button type="button" class="alert-close" (click)="dismissSuccess()" aria-label="Close">
+          &times;
+        </button>
+      </div>
+    }
+      @if (errorMessage()) {
+        <div class="error-message">{{ errorMessage() }}</div>
+      }
+      <div class="button-group">
+        <button type="submit">Sign Up</button>
+        <button type="button" (click)="toggleMode()">Back to Login</button>
+      </div>
+
+    </form>
+
+} @else {
+
+  <!-- LOGIN FORM -->
+  <p>Login</p>
+
+  <form (submit)="onSubmit($event)">
+    <div>
+      <label>
+        Username:
+        <input type="text" [formField]="loginForm.user" />
+      </label>
+      @if (loginForm.user().touched() && loginForm.user().invalid()) {
+        <ul class="error-list">
+          @for (error of loginForm.user().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div>
+      <label>
+        Password:
+        <input type="password" [formField]="loginForm.password" />
+      </label>
+      @if (loginForm.password().touched() && loginForm.password().invalid()) {
+        <div class="error-list">
+          @for (error of loginForm.password().errors(); track error) {
+            <p>{{ error.message }}</p>
+          }
+        </div>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-message">{{ errorMessage() }}</div>
+    }
+
+    <div class="button-group">
+      <button type="submit">Log In</button>
+      <button type="button" (click)="toggleMode()">Register</button>
+    </div>
+  </form>
+}
+</div>
+<!-- SUCCESS POPUP MODAL OVERLAY -->
+@if (successMessage()) {
+  <div class="modal-backdrop" (click)="dismissSuccess()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-icon-wrapper">
+        <svg class="modal-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      
+      <h3 class="modal-title">Success!</h3>
+      <p class="modal-message">{{ successMessage() }}</p>
+
+      <button type="button" class="modal-button" (click)="dismissSuccess()">
+        Continue
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,149 @@
+
+<div class="tabs-header" role="tablist">
+      @for (tab of tabs; track $index) {
+        <button 
+          role="tab"
+          [class.active]="activeTabIndex() === $index"
+          [attr.aria-selected]="activeTabIndex() === $index"
+          (click)="activeTabIndex.set($index)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+</div>
+
+    <div class="tab-panel" role="tabpanel">
+      @switch (activeTabIndex()) {
+      @case (0) { <div>
+        <div class="">Black and African American</div>
+        <p>Black and African American women have shaped history, culture, and social progress in the 
+          United States despite facing deep systemic barriers. Key figures include Harriet Tubman, 
+          Shirley Chisholm, and Rosa Parks.</p>
+
+        <div class="card-image-container">
+          <img [ngSrc]="blackandafricanamerican" fill alt="Dynamic card background" />
+        </div>
+<h3>Display Child Component</h3>
+<div class="cards-container">
+  @for (woman of blackWomen(); track woman.id) {
+    <div class="card">
+      <img [src]="woman.avatar" [alt]="woman.name" width="50" height="50" />
+      <div>
+        <strong>{{ woman.name }}</strong> ({{ woman.age }})
+        <p>{{ woman.email }} • {{ woman.country }} • {{ woman.race }}</p>
+      </div>
+    </div>
+  } @empty {
+    <p>No women data available.</p>
+  }
+</div>
+
+      </div> }
+      @case (1) {<div>
+        <div>Asian</div>
+        <p>Asian women are a diverse group of individuals encompassing vast cultural, ethnic, and national backgrounds across the continent of Asia and the global diaspora. Rather than a single uniform description, they represent thousands 
+          of distinct heritages, languages, traditions, and lived experiences.</p>
+        <div class="card-image-container">
+          <img [ngSrc]="asian" fill alt="Dynamic card background" />
+        </div>
+        <h3>Display Child Component</h3>
+<div class="cards-container">
+  @for (woman of asianWomen(); track woman.id) {
+    <div class="card">
+      <img [src]="woman.avatar" [alt]="woman.name" width="50" height="50" />
+      <div>
+        <strong>{{ woman.name }}</strong> ({{ woman.age }})
+        <p>{{ woman.email }} • {{ woman.country }} • {{ woman.race }}</p>
+      </div>
+    </div>
+  } @empty {
+    <p>No women data available.</p>
+  }
+</div>
+      </div>  }
+      @case (2) { <div>
+        <div>Caucasian / White</div>
+        <p>female individuals of European, Middle Eastern, or North African ancestry, a term originating from 18th-century anthropology.</p>
+        <div class="card-image-container">
+          <img [ngSrc]="caucasianwhite" fill alt="Dynamic card background" />
+        </div>
+        <h3>Display Child Component</h3>
+<div class="cards-container">
+  @for (woman of caucasianWomen(); track woman.id) {
+    <div class="card">
+      <img [src]="woman.avatar" [alt]="woman.name" width="50" height="50" />
+      <div>
+        <strong>{{ woman.name }}</strong> ({{ woman.age }})
+        <p>{{ woman.email }} • {{ woman.country }} • {{ woman.race }}</p>
+      </div>
+    </div>
+  } @empty {
+    <p>No women data available.</p>
+  }
+</div>
+      </div>  }
+      @case (3) {
+      <div>
+        <div>Indigenous and Native</div>
+        <p>Native American women have historically and presently served as essential leaders,
+           healers, and cultural preservers within their communities, with prominent historical 
+           figures including Sacagawea, Wilma Mankiller, and Deb Haaland.</p>
+        <div class="card-image-container">
+          <img [ngSrc]="indiandnative" fill alt="Dynamic card background" />
+        </div>
+    <h3>Display Child Component</h3>
+<div class="cards-container">
+  @for (woman of indigenousWomen(); track woman.id) {
+    <div class="card">
+      <img [src]="woman.avatar" [alt]="woman.name" width="50" height="50" />
+      <div>
+        <strong>{{ woman.name }}</strong> ({{ woman.age }})
+        <p>{{ woman.email }} • {{ woman.country }} • {{ woman.race }}</p>
+      </div>
+    </div>
+  } @empty {
+    <p>No women data available.</p>
+  }
+</div>
+      </div> }
+      @case (4) {<div>
+        <div>Hispanic and Latino</div>
+        <p>Hispanic and Latino women—often called Latinas—are a diverse, vibrant group representing rich cultures, 
+          deep-rooted family values, and a strong history of achievement across society</p>
+        <div class="card-image-container">
+          <img [ngSrc]="hispanicandlatino" fill alt="Dynamic card background" />
+        </div>
+        <h3>Display Child Component</h3>
+<div class="cards-container">
+  @for (woman of hispanicWomen(); track woman.id) {
+    <div class="card">
+      <img [src]="woman.avatar" [alt]="woman.name" width="50" height="50" />
+      <div>
+        <strong>{{ woman.name }}</strong> ({{ woman.age }})
+        <p>{{ woman.email }} • {{ woman.country }} • {{ woman.race }}</p>
+      </div>
+    </div>
+  } @empty {
+    <p>No women data available.</p>
+  }
+</div>
+      </div>   }
+    
+      }
+    </div>
+    <!-- 
+    <h3>Display Child Component</h3>
+    <div class="cards-container">
+      @for (woman of women(); track woman.id) {
+        <div class="card">
+          <img [src]="woman.avatar" [alt]="woman.name" width="50" height="50" />
+          <div>
+            <strong>{{ woman.name }}</strong> ({{ woman.age }})
+            <p>{{ woman.email }} • {{ woman.country }} • {{ woman.race }}</p>
+          </div>
+        </div>
+      } @empty {
+        <p>No women data available.</p>
+      }
+    </div>
+    -->

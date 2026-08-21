@@ -1,0 +1,26 @@
+<div class="main">
+<div class="admin-header">
+  <h3>Admin Section : {{username}}</h3>
+  <button (click)="goToPublicSection()">Go to Public Section</button>
+  <button (click)="logout()">logout</button>
+</div>
+
+<app-users></app-users>
+<!--<app-womenregister></app-womenregister> -->
+
+<!-- Receive signal emission directly in template event handler -->
+    <app-womenregister (womenData)="receivedWomen.set($event)" />
+<!--
+    <h2>Parent Received {{ receivedWomen().length }} items:</h2>
+    <ul>
+      @for (person of receivedWomen(); track person.id) {
+        <li>{{ person.name }} - {{ person.country }}</li>
+      }
+    </ul>
+-->
+
+<app-women-tabs [women]="receivedWomen()"></app-women-tabs>
+
+
+
+</div>

@@ -1,0 +1,62 @@
+<div class="woman-card-grid">
+  @for (woman of women(); track woman.id) {
+    <div class="woman-card">
+      <!-- Avatar Image Display -->
+      <div class="avatar-container">
+        <img 
+          [src]="woman.avatar || 'assets/default-avatar.png'" 
+          [alt]="woman.name" 
+          class="avatar-img"
+          (error)="$any($event.target).src = 'assets/default-avatar.png'" 
+        />
+      </div>
+
+      <div class="woman-details">
+        <h3>{{ woman.name }}</h3>
+        <p class="meta">{{ woman.country }} • {{ woman.age ? woman.age + ' yrs' : 'N/A' }}</p>
+
+        <!-- Rating Summary -->
+        @let summary = ratingsMap().get(woman.id);
+        <div class="rating-badge">
+          <span class="stars">★ {{ summary?.averageRate ?? 0 }} / 5</span>
+          <span class="count">({{ summary?.totalRatings ?? 0 }} ratings)</span>
+        </div>
+
+        <button class="btn-rate" (click)="openRateModal(woman)">+ Add Rating</button>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Add Rating Modal -->
+@if (selectedWomanForRating(); as selectedWoman) {
+  <div class="modal-backdrop">
+    <div class="modal-card">
+      <h3>Rate {{ selectedWoman.name }}</h3>
+      
+      <div class="modal-body">
+        <img 
+          [src]="selectedWoman.avatar || 'assets/default-avatar.png'" 
+          [alt]="selectedWoman.name" 
+          class="modal-avatar" 
+        />
+
+        <div class="rating-select">
+          <label for="rate">Select Rating (1 to 5):</label>
+          <select id="rate" [ngModel]="selectedRate()" (ngModelChange)="selectedRate.set(+$event)">
+            <option [value]="5">5 - Excellent</option>
+            <option [value]="4">4 - Good</option>
+            <option [value]="3">3 - Average</option>
+            <option [value]="2">2 - Fair</option>
+            <option [value]="1">1 - Poor</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="closeRateModal()" class="btn-secondary">Cancel</button>
+        <button (click)="submitRating()" class="btn-primary">Submit Rating</button>
+      </div>
+    </div>
+  </div>
+}
