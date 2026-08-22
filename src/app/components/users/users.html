@@ -1,8 +1,7 @@
 <h4>Users</h4>
 
-
 <div class="custom-table">
- <div class="controls">
+  <div class="controls">
     <input 
       [class.custom-input]="true"
       [style.font-size.px]="16"
@@ -24,8 +23,9 @@
         <th>Role</th>
         <th>Email</th>
         <th></th>
-        <th><!-- New Add Button -->
-        <button class="add-btn" (click)="openAddModal()">+ Add New Record</button></th>
+        <th>
+          <button class="add-btn" (click)="openAddModal()">+ Add New Record</button>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -41,11 +41,11 @@
             <button (click)="openEditModal(user)">Edit</button>
           </td>
           <td>
-            <button (click)="deleteUser(user)">Delete</button>
+            <button class="delete-btn" (click)="confirmDelete(user)">Delete</button>
           </td>
         </tr>
       } @empty {
-        <tr><td colspan="6">No items match your filter criteria.</td></tr>
+        <tr><td colspan="8">No items match your filter criteria.</td></tr>
       }
     </tbody>
   </table>
@@ -60,10 +60,28 @@
     <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()">Next ›</button>
     <button (click)="goToPage(totalPages())" [disabled]="currentPage() === totalPages()">»</button>
   </div>
+
   @if (selectedRecord()) {
     <app-editmodal 
       [record]="selectedRecord()" 
       (save)="saveRecord($event)" 
       (cancel)="closeModal()" />
+  }
+
+  <!-- Delete Confirmation Modal -->
+  @if (userToDelete(); as targetUser) {
+    <div class="delete-modal-overlay" (click)="cancelDelete()">
+      <div class="delete-modal" (click)="$event.stopPropagation()">
+        <div class="delete-icon">⚠️</div>
+        <h3>Delete User</h3>
+        <p>Are you sure you want to remove <strong>{{ targetUser.name }}</strong> (&#64;{{ targetUser.username }})?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+        
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+          <button class="btn-confirm-delete" (click)="executeDelete()">Yes, Delete</button>
+        </div>
+      </div>
+    </div>
   }
 </div>
