@@ -1,5 +1,14 @@
 <h4>Users</h4>
 
+<!-- Floating Notification Alert -->
+@if (notification(); as alert) {
+  <div class="toast-alert" [ngClass]="alert.type">
+    <span class="toast-icon">{{ alert.type === 'success' ? '✅' : '❌' }}</span>
+    <span class="toast-message">{{ alert.message }}</span>
+    <button class="toast-close" (click)="dismissNotification()">✕</button>
+  </div>
+}
+
 <div class="custom-table">
   <div class="controls">
     <input 
