@@ -1,26 +1,26 @@
 <div class="main">
-<div class="admin-header">
-  <h3>Admin Section : {{username}}</h3>
-  <button (click)="goToPublicSection()">Go to Public Section</button>
-  <button (click)="logout()">logout</button>
-</div>
+  <!-- Unified Top Bar -->
+  <header class="top-bar">
+    <div class="top-bar-container">
+      <div class="user-greeting">
+        <h3>Admin Section : {{ username }}</h3>
+      </div>
+      
+      <div class="nav-actions">
+        <button class="btn btn-public" (click)="goToPublicSection()">
+          Go to Public Section
+        </button>
+        <button class="btn btn-logout" (click)="logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
 
-<app-users></app-users>
-<!--<app-womenregister></app-womenregister> -->
+  <app-users></app-users>
 
-<!-- Receive signal emission directly in template event handler -->
-    <app-womenregister (womenData)="receivedWomen.set($event)" />
-<!--
-    <h2>Parent Received {{ receivedWomen().length }} items:</h2>
-    <ul>
-      @for (person of receivedWomen(); track person.id) {
-        <li>{{ person.name }} - {{ person.country }}</li>
-      }
-    </ul>
--->
+  <!-- Receive signal emission directly in template event handler -->
+  <app-womenregister (womenData)="receivedWomen.set($event)" />
 
-<app-women-tabs [women]="receivedWomen()"></app-women-tabs>
-
-
-
+  <app-women-tabs [women]="receivedWomen()"></app-women-tabs>
 </div>
