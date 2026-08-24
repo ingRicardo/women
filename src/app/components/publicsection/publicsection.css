@@ -368,3 +368,130 @@ main {
       display: inline-block;
       margin-top: 0.25rem;
     }
+
+
+    /* Footer Container */
+.app-footer {
+  background-color: #0f172a;
+  color: #f8fafc;
+  padding: 1.5rem 2rem;
+  margin-top: 3rem;
+  border-top: 1px solid #1e293b;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+/* User Profile Details */
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #38bdf8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.details h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.email-link {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.email-link:hover {
+  color: #38bdf8;
+  text-decoration: underline;
+}
+
+/* Social Media Icons */
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.social-icon {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 50%;
+  background-color: #1e293b;
+  transition: all 0.2s ease-in-out;
+}
+
+.social-icon:hover {
+  transform: translateY(-2px);
+}
+
+.social-icon.facebook:hover {
+  background-color: #1877f2;
+  color: #ffffff;
+}
+
+.social-icon.github:hover {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+/* Responsive adjustment for mobile screens */
+@media (max-width: 600px) {
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .profile-info {
+    flex-direction: column;
+  }
+}
+
+/* WhatsApp Text Link */
+.whatsapp-link {
+  display: block;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.whatsapp-link:hover {
+  color: #25d366;
+  text-decoration: underline;
+}
+
+/* WhatsApp Icon Hover State */
+.social-icon.whatsapp:hover {
+  background-color: #25d366;
+  color: #ffffff;
+}
+
+/* LinkedIn Icon Hover State */
+.social-icon.linkedin:hover {
+  background-color: #0a66c2;
+  color: #ffffff;
+}
