@@ -1,310 +1,355 @@
- <div class=" ">
-      <!-- Registration Section -->
-      <section class="">
-        <div class="header-title">
-          <h2>Register Woman</h2>
-          <p>Add a new profile to the roster</p>
+<div>
+  <!-- Registration Section -->
+  <section>
+    <div class="header-title">
+      <h2>Register Woman</h2>
+      <p>Add a new profile to the roster</p>
+    </div>
+
+    <form [formGroup]="womanForm" (ngSubmit)="onSubmit()" class="form-grid">
+      <!-- Avatar Image URL Field with Live Preview -->
+      <div class="form-group full-width">
+        <label for="avatar">Avatar Image URL</label>
+        <div class="avatar-input-container">
+          <img 
+            [src]="womanForm.get('avatar')?.value || 'https://i.pravatar.cc/150?img=20'" 
+            (error)="$any($event.target).src = 'https://i.pravatar.cc/150?img=20'"
+            alt="Avatar preview" 
+            class="avatar-preview"
+          />
+          <input 
+            id="avatar" 
+            type="url" 
+            formControlName="avatar" 
+            placeholder="https://example.com/avatar.jpg" 
+          />
         </div>
-
-        <form [formGroup]="womanForm" (ngSubmit)="onSubmit()" class="form-grid">
-          <!-- Avatar Image URL Field with Live Preview -->
-          <div class="form-group full-width">
-            <label for="avatar">Avatar Image URL</label>
-            <div class="avatar-input-container">
-              <img 
-                [src]="womanForm.get('avatar')?.value || 'https://i.pravatar.cc/150?img=20'" 
-                (error)="$any($event.target).src = 'https://i.pravatar.cc/150?img=20'"
-                alt="Avatar preview" 
-                class="avatar-preview"
-              />
-              <input 
-                id="avatar" 
-                type="url" 
-                formControlName="avatar" 
-                placeholder="https://example.com/avatar.jpg" 
-              />
-            </div>
-            @if (isFieldInvalid('avatar')) {
-              <small class="error-msg">A valid avatar URL is required.</small>
-            }
-          </div>
-          <div class="form-group">
-            <label for="name">Full Name</label>
-            <input id="name" type="text" formControlName="name" placeholder="e.g. Alice Smith" />
-            @if (isFieldInvalid('name')) {
-              <small class="error-msg">Name is required.</small>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input id="email" type="email" formControlName="email" placeholder="alice@example.com" />
-            @if (isFieldInvalid('email')) {
-              <small class="error-msg">Valid email is required.</small>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="dateofbirth">Date of Birth</label>
-            <input id="dateofbirth" type="date" formControlName="dateofbirth" (change)="onDobChange()" />
-            @if (isFieldInvalid('dateofbirth')) {
-              <small class="error-msg">Date of birth is required.</small>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="age">Age</label>
-            <input id="age" type="number" formControlName="age" placeholder="Calculated or manual" />
-          </div>
-
-          <div class="form-group">
-            <label for="status">Marital Status</label>
-            <select id="status" formControlName="status">
-              <option value="Single">Single</option>
-              <option value="Married">Married</option>
-              <option value="Divorced">Divorced</option>
-              <option value="Widowed">Widowed</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="country">Country</label>
-            <input id="country" type="text" formControlName="country" placeholder="e.g. USA" />
-            @if (isFieldInvalid('country')) {
-              <small class="error-msg">Country is required.</small>
-            }
-          </div>
-        <div class="form-group">
-          <label for="race">Race / Ethnicity</label>
-          <select id="race" formControlName="race">
-            <option value="" disabled selected>Select Race / Ethnicity</option>
-            @for (race of raceOptions; track race) {
-              <option [value]="race">{{ race }}</option>
-            }
-          </select>
-        </div>
-
-          <div class="form-actions">
-            <button type="submit" [disabled]="womanForm.invalid" class="btn-primary">
-              Register Woman
-            </button>
-          </div>
-        </form>
-      </section>
-      <br />
-      <div class=" ">
-      <header class="table-header">
-        <div class="title-group">
-          <h2>Woman Roster</h2>
-          <span class="badge">{{ filteredWomen().length }} entries</span>
-        </div>
-        <input 
-          type="text" 
-          placeholder="Search women..." 
-          [value]="searchQuery()" 
-          (input)="onSearch($event)"
-          class="search-input"
-        />
-      </header>
-
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Age</th>
-              <th>Status</th>
-              <th>DOB</th>
-              <th>Country</th>
-              <th>Race</th>
-              <th>Email</th>
-              <th class="text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (woman of paginatedWomen(); track woman.id) {
-              <tr>
-                <td class="muted">#{{ woman.id }}</td>
-               <td>
-                  <div class="user-profile-cell">
-                    <img 
-                      [src]="woman.avatar" 
-                      [alt]="woman.name + ' avatar'" 
-                      class="avatar-img"
-                      loading="lazy"
-                    />
-                    <span class="font-semibold">{{ woman.name }}</span>
-                  </div>
-                </td>
-                <td>{{ woman.age }}</td>
-                <td>
-                  <span class="status-badge" [class.single]="woman.status === 'Single'">
-                    {{ woman.status }}
-                  </span>
-                </td>
-              <!-- BEFORE (broken if property is dateOfBirth or non-ISO string) -->
-                <td>{{ woman.dateOfBirth| date:'yyyy-MM-dd' }}</td>
-                <td>{{ woman.country }}</td>
-                <td>{{ woman.race }}</td>
-                <td>
-                  <a [href]="'mailto:' + woman.email" class="email-link">{{ woman.email }}</a>
-                </td>
-                <td class="text-right">
-                  <button 
-                    type="button" 
-                    class="btn-delete" 
-                    (click)="removeWoman(woman.id)" 
-                    aria-label="Delete user"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="9" class="empty-state">No users matching your criteria.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        @if (isFieldInvalid('avatar')) {
+          <small class="error-msg">A valid avatar URL is required.</small>
+        }
       </div>
- <!-- Pagination Footer -->
-      <footer class="pagination-footer">
-        <div class="page-size-selector">
-          <label for="pageSize">Rows per page:</label>
-          <select 
-            id="pageSize" 
-            [value]="pageSize()" 
-            (change)="onPageSizeChange($event)"
-          >
-            <option [value]="5">5</option>
-            <option [value]="10">10</option>
-            <option [value]="20">20</option>
-          </select>
-        </div>
 
-        <div class="pagination-info">
-          Showing 
-          <strong>{{ startIndex() }}</strong> - <strong>{{ endIndex() }}</strong> 
-          of <strong>{{ filteredWomen().length }}</strong>
-        </div>
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input id="name" type="text" formControlName="name" placeholder="e.g. Alice Smith" />
+        @if (isFieldInvalid('name')) {
+          <small class="error-msg">Name is required.</small>
+        }
+      </div>
 
-        <div class="pagination-controls">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input id="email" type="email" formControlName="email" placeholder="alice@example.com" />
+        @if (isFieldInvalid('email')) {
+          <small class="error-msg">Valid email is required.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="dateofbirth">Date of Birth</label>
+        <input id="dateofbirth" type="date" formControlName="dateofbirth" (change)="onDobChange()" />
+        @if (isFieldInvalid('dateofbirth')) {
+          <small class="error-msg">Date of birth is required.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="age">Age</label>
+        <input id="age" type="number" formControlName="age" placeholder="Calculated or manual" />
+      </div>
+
+      <div class="form-group">
+        <label for="status">Marital Status</label>
+        <select id="status" formControlName="status">
+          <option value="Single">Single</option>
+          <option value="Married">Married</option>
+          <option value="Divorced">Divorced</option>
+          <option value="Widowed">Widowed</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="country">Country</label>
+        <input id="country" type="text" formControlName="country" placeholder="e.g. USA" />
+        @if (isFieldInvalid('country')) {
+          <small class="error-msg">Country is required.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="race">Race / Ethnicity</label>
+        <select id="race" formControlName="race">
+          <option value="" disabled selected>Select Race / Ethnicity</option>
+          @for (race of raceOptions; track race) {
+            <option [value]="race">{{ race }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="womanForm.invalid" class="btn-primary">
+          Register Woman
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <br />
+
+  <div>
+    <header class="table-header">
+      <div class="title-group">
+        <h2>Woman Roster</h2>
+        <span class="badge">{{ filteredWomen().length }} entries</span>
+      </div>
+      <input 
+        type="text" 
+        placeholder="Search women..." 
+        [value]="searchQuery()" 
+        (input)="onSearch($event)"
+        class="search-input"
+      />
+    </header>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Status</th>
+            <th>DOB</th>
+            <th>Country</th>
+            <th>Race</th>
+            <th>Email</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (woman of paginatedWomen(); track woman.id) {
+            <tr>
+              <td class="muted">#{{ woman.id }}</td>
+              <td>
+                <div class="user-profile-cell">
+                  <img 
+                    [src]="woman.avatar" 
+                    [alt]="woman.name + ' avatar'" 
+                    class="avatar-img"
+                    loading="lazy"
+                  />
+                  <span class="font-semibold">{{ woman.name }}</span>
+                </div>
+              </td>
+              <td>{{ woman.age }}</td>
+              <td>
+                <span class="status-badge" [class.single]="woman.status === 'Single'">
+                  {{ woman.status }}
+                </span>
+              </td>
+              <td>{{ woman.dateOfBirth | date:'yyyy-MM-dd' }}</td>
+              <td>{{ woman.country }}</td>
+              <td>{{ woman.race }}</td>
+              <td>
+                <a [href]="'mailto:' + woman.email" class="email-link">{{ woman.email }}</a>
+              </td>
+              <td class="text-right">
+                <button 
+                  type="button" 
+                  class="btn-delete" 
+                  (click)="promptRemoveWoman(woman.id)" 
+                  aria-label="Delete user"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="9" class="empty-state">No users matching your criteria.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <footer class="pagination-footer">
+      <div class="page-size-selector">
+        <label for="pageSize">Rows per page:</label>
+        <select 
+          id="pageSize" 
+          [value]="pageSize()" 
+          (change)="onPageSizeChange($event)"
+        >
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+        </select>
+      </div>
+
+      <div class="pagination-info">
+        Showing 
+        <strong>{{ startIndex() }}</strong> - <strong>{{ endIndex() }}</strong> 
+        of <strong>{{ filteredWomen().length }}</strong>
+      </div>
+
+      <div class="pagination-controls">
+        <button 
+          type="button" 
+          class="btn-page" 
+          [disabled]="currentPage() === 1" 
+          (click)="goToPage(currentPage() - 1)"
+        >
+          Previous
+        </button>
+
+        @for (page of totalPagesArray(); track page) {
           <button 
             type="button" 
-            class="btn-page" 
-            [disabled]="currentPage() === 1" 
-            (click)="goToPage(currentPage() - 1)"
+            class="btn-page page-num" 
+            [class.active]="page === currentPage()" 
+            (click)="goToPage(page)"
           >
-            Previous
+            {{ page }}
           </button>
+        }
 
-          @for (page of totalPagesArray(); track page) {
-            <button 
-              type="button" 
-              class="btn-page page-num" 
-              [class.active]="page === currentPage()" 
-              (click)="goToPage(page)"
-            >
-              {{ page }}
-            </button>
-          }
+        <button 
+          type="button" 
+          class="btn-page" 
+          [disabled]="currentPage() >= totalPages() || totalPages() === 0" 
+          (click)="goToPage(currentPage() + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </footer>
+  </div>
 
-          <button 
-            type="button" 
-            class="btn-page" 
-            [disabled]="currentPage() >= totalPages() || totalPages() === 0" 
-            (click)="goToPage(currentPage() + 1)"
-          >
-            Next
-          </button>
-        </div>
-      </footer>
+  <h3>statistics</h3>
+
+  <!-- Status Statistics Bar -->
+  <section class="stats-bar">
+    <div class="stats-header">
+      <h3>Status Overview</h3>
+      <span class="total-count">Total: {{ women().length }} Users</span>
     </div>
-    <h3>statistics</h3>
- 
-    <!-- Status Statistics Bar -->
-      <section class="stats-bar">
-        <div class="stats-header">
-          <h3>Status Overview</h3>
-          <span class="total-count">Total: {{ women().length }} Users</span>
-        </div>
 
-        <div class="stats-grid">
-          @for (stat of statusStats(); track stat.status) {
-            <div class="stat-card" [class]="stat.status.toLowerCase()">
-              <div class="stat-info">
-                <span class="stat-label">{{ stat.status }}</span>
-                <span class="stat-count">{{ stat.count }}</span>
-              </div>
-              <div class="stat-progress-wrapper">
-                <div 
-                  class="stat-progress-bar" 
-                  [style.width.%]="stat.percentage"
-                ></div>
-              </div>
-              <span class="stat-percentage">{{ stat.percentage }}%</span>
-            </div>
+    <div class="stats-grid">
+      @for (stat of statusStats(); track stat.status) {
+        <div class="stat-card" [class]="stat.status.toLowerCase()">
+          <div class="stat-info">
+            <span class="stat-label">{{ stat.status }}</span>
+            <span class="stat-count">{{ stat.count }}</span>
+          </div>
+          <div class="stat-progress-wrapper">
+            <div 
+              class="stat-progress-bar" 
+              [style.width.%]="stat.percentage"
+            ></div>
+          </div>
+          <span class="stat-percentage">{{ stat.percentage }}%</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Race Statistics Donut Circle -->
+  <section class="circle-stats-section">
+    <div class="stats-header">
+      <h3>Race Distribution</h3>
+    </div>
+
+    <div class="chart-container">
+      <div class="donut-wrapper">
+        <svg viewBox="0 0 100 100" class="donut-chart">
+          <circle 
+            cx="50" 
+            cy="50" 
+            r="15.91549430918954" 
+            fill="transparent" 
+            stroke="#f3f4f6" 
+            stroke-width="6" 
+          />
+          @for (segment of raceStats(); track segment.label) {
+            <circle 
+              cx="50" 
+              cy="50" 
+              r="15.91549430918954" 
+              fill="transparent" 
+              [attr.stroke]="segment.color" 
+              stroke-width="6" 
+              [attr.stroke-dasharray]="segment.dashArray" 
+              [attr.stroke-dashoffset]="segment.dashOffset"
+              class="donut-segment"
+            />
           }
+        </svg>
+        <div class="donut-center-text">
+          <span class="center-value">{{ women().length }}</span>
+          <span class="center-label">Total Women</span>
         </div>
-      </section>
-<!-- Race Statistics Donut Circle -->
-      <section class="circle-stats-section">
-        <div class="stats-header">
-          <h3>Race Distribution</h3>
-        </div>
+      </div>
 
-        <div class="chart-container">
-          <!-- Circular SVG Donut Chart -->
-          <div class="donut-wrapper">
-            <svg viewBox="0 0 100 100" class="donut-chart">
-              <!-- Background Ring -->
-              <circle 
-                cx="50" 
-                cy="50" 
-                r="15.91549430918954" 
-                fill="transparent" 
-                stroke="#f3f4f6" 
-                stroke-width="6" 
-              />
-              <!-- Donut Segments -->
-              @for (segment of raceStats(); track segment.label) {
-                <circle 
-                  cx="50" 
-                  cy="50" 
-                  r="15.91549430918954" 
-                  fill="transparent" 
-                  [attr.stroke]="segment.color" 
-                  stroke-width="6" 
-                  [attr.stroke-dasharray]="segment.dashArray" 
-                  [attr.stroke-dashoffset]="segment.dashOffset"
-                  class="donut-segment"
-                />
-              }
-            </svg>
-            <div class="donut-center-text">
-              <span class="center-value">{{ women().length }}</span>
-              <span class="center-label">Total Women</span>
+      <div class="legend-grid">
+        @for (item of raceStats(); track item.label) {
+          <div class="legend-item">
+            <div class="legend-left">
+              <span class="color-dot" [style.background-color]="item.color"></span>
+              <span class="legend-label">{{ item.label }}</span>
+            </div>
+            <div class="legend-right">
+              <span class="legend-count">{{ item.count }}</span>
+              <span class="legend-badge">{{ item.percentage }}%</span>
             </div>
           </div>
+        }
+      </div>
+    </div>
+  </section>
 
-          <!-- Interactive Legend & Details -->
-          <div class="legend-grid">
-            @for (item of raceStats(); track item.label) {
-              <div class="legend-item">
-                <div class="legend-left">
-                  <span class="color-dot" [style.background-color]="item.color"></span>
-                  <span class="legend-label">{{ item.label }}</span>
-                </div>
-                <div class="legend-right">
-                  <span class="legend-count">{{ item.count }}</span>
-                  <span class="legend-badge">{{ item.percentage }}%</span>
-                </div>
-              </div>
-            }
+  <!-- Delete Confirmation Modal -->
+  @if (showDeleteModal()) {
+    <div class="modal-backdrop" (click)="cancelDelete()">
+      <div class="modal-card danger-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-icon danger-icon">⚠️</div>
+          <h3>Confirm Record Deletion</h3>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete woman record <strong>#{{ pendingDeleteId() }}</strong>?</p>
+          <p class="sub-text">This action cannot be undone.</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+          <button type="button" class="btn-confirm-delete" (click)="confirmRemoveWoman()">Delete Record</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Add Confirmation Modal -->
+  @if (showAddModal()) {
+    <div class="modal-backdrop" (click)="cancelAdd()">
+      <div class="modal-card info-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-icon info-icon">👤</div>
+          <h3>Confirm Registration</h3>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to add <strong>{{ pendingFormData()?.name }}</strong> to the roster?</p>
+          <div class="summary-details">
+            <div><strong>Email:</strong> {{ pendingFormData()?.email }}</div>
+            <div><strong>Country:</strong> {{ pendingFormData()?.country }}</div>
+            <div><strong>Status:</strong> {{ pendingFormData()?.status }}</div>
           </div>
         </div>
-      </section>
-
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="cancelAdd()">Cancel</button>
+          <button type="button" class="btn-confirm-add" (click)="confirmAddWoman()">Confirm & Register</button>
+        </div>
+      </div>
     </div>
+  }
+</div>
