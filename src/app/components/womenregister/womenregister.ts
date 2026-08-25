@@ -3,23 +3,13 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { WomanService } from '../../services/woman.service';
 import { Woman } from '../models/woman.model';
-/*
-interface Woman {
-  id: number;
-  name: string;
-  avatar: string;
-  age: number;
-  status: string;
-  dateofbirth: string;
-  country: string;
-  race: string;
-  email: string;
-} */
+
 export interface StatusStat {
   status: string;
   count: number;
   percentage: number;
 }
+
 export interface StatItem {
   label: string;
   count: number;
@@ -36,22 +26,26 @@ export interface StatItem {
   templateUrl: './womenregister.html',
   styleUrl: './womenregister.css',
 })
-
 export class Womenregister implements OnInit {
-womanForm: FormGroup;
-
-
-private womanService = inject(WomanService);
+  womanForm: FormGroup;
+  private womanService = inject(WomanService);
   women = signal<Woman[]>([]);
-  
+
+  // Confirmation Modal Signals
+  showDeleteModal = signal<boolean>(false);
+  pendingDeleteId = signal<number | null>(null);
+
+  showAddModal = signal<boolean>(false);
+  pendingFormData = signal<Omit<Woman, 'id'> | null>(null);
+
   ngOnInit(): void {
     this.womanService.getWomen().subscribe({
       next: (data) => this.women.set(data),
       error: (err) => console.error('Error fetching women records:', err),
     });
   }
- 
-raceOptions: string[] = [
+
+  raceOptions: string[] = [
     'American Indian or Alaska Native',
     'Asian',
     'Black and African American',
@@ -67,8 +61,6 @@ raceOptions: string[] = [
   currentPage = signal<number>(1);
   pageSize = signal<number>(5);
 
- 
-// Computes counts and percentages for each status reactively
   statusStats = computed<StatusStat[]>(() => {
     const list = this.women();
     const total = list.length;
@@ -83,8 +75,8 @@ raceOptions: string[] = [
     });
   });
 
-private palette = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'];
-// Race distribution computed values (SVG stroke calculation)
+  private palette = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'];
+
   raceStats = computed<StatItem[]>(() => {
     const list = this.women();
     const total = list.length;
@@ -122,8 +114,7 @@ private palette = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6474
     return items;
   });
 
-
-filteredWomen = computed(() => {
+  filteredWomen = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
     if (!q) return this.women();
 
@@ -133,31 +124,28 @@ filteredWomen = computed(() => {
       u.country.toLowerCase().includes(q)
     );
   });
-// Calculate total pages dynamically
-  totalPages = computed(() => Math.ceil(this.filteredWomen().length / this.pageSize()));
 
-  // Array of page numbers for rendering page buttons
+  totalPages = computed(() => Math.ceil(this.filteredWomen().length / this.pageSize()));
   totalPagesArray = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
-  // Slice filtered users to display current page
   paginatedWomen = computed(() => {
     const start = (this.currentPage() - 1) * this.pageSize();
     return this.filteredWomen().slice(start, start + this.pageSize());
   });
 
-  // Display calculations (e.g. "Showing 1 - 5 of 7")
   startIndex = computed(() => (this.filteredWomen().length === 0 ? 0 : (this.currentPage() - 1) * this.pageSize() + 1));
   endIndex = computed(() => Math.min(this.currentPage() * this.pageSize(), this.filteredWomen().length));
-onSearch(event: Event): void {
+
+  onSearch(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.searchQuery.set(value);
-    this.currentPage.set(1); // Reset to first page on search
+    this.currentPage.set(1);
   }
 
   onPageSizeChange(event: Event): void {
     const size = Number((event.target as HTMLSelectElement).value);
     this.pageSize.set(size);
-    this.currentPage.set(1); // Reset to first page on page size change
+    this.currentPage.set(1);
   }
 
   goToPage(page: number): void {
@@ -166,12 +154,11 @@ onSearch(event: Event): void {
     }
   }
 
-// 2. Define the output channel
   womenData = output<Woman[]>();
 
   constructor(private fb: FormBuilder) {
     this.womanForm = this.fb.group({
-      avatar: ['', [Validators.required]], // Or leave validators empty if optional
+      avatar: ['', [Validators.required]],
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       dateofbirth: ['', Validators.required],
@@ -180,7 +167,7 @@ onSearch(event: Event): void {
       country: ['', Validators.required],
       race: ['']
     });
-    // 3. Automatically send data to parent on init and whenever 'women' signal updates
+
     effect(() => {
       this.womenData.emit(this.women());
     });
@@ -205,46 +192,79 @@ onSearch(event: Event): void {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
+  // Request deletion confirmation
+  promptRemoveWoman(id: number): void {
+    this.pendingDeleteId.set(id);
+    this.showDeleteModal.set(true);
+  }
 
-  removeWoman(id: number): void {
-  this.womanService.deleteWoman(id).subscribe({
-    next: () => {
-      // Remove item from local signal list
-      this.women.update(list => list.filter(woman => woman.id !== id));
+  // Execute deletion after confirmation
+  confirmRemoveWoman(): void {
+    const id = this.pendingDeleteId();
+    if (id === null) return;
 
-      // Auto-adjust page if deletion empties current page
-      if (this.currentPage() > this.totalPages() && this.totalPages() > 0) {
-        this.currentPage.set(this.totalPages());
+    this.womanService.deleteWoman(id).subscribe({
+      next: () => {
+        this.women.update(list => list.filter(woman => woman.id !== id));
+
+        if (this.currentPage() > this.totalPages() && this.totalPages() > 0) {
+          this.currentPage.set(this.totalPages());
+        }
+        this.cancelDelete();
+      },
+      error: (err) => {
+        console.error(`Failed to delete record with ID ${id}:`, err);
+        this.cancelDelete();
       }
-    },
-    error: (err) => {
-      console.error(`Failed to delete record with ID ${id}:`, err);
-    }
-  });
-}
+    });
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal.set(false);
+    this.pendingDeleteId.set(null);
+  }
+
+  // Request addition confirmation
   onSubmit(): void {
-if (this.womanForm.valid) {
-    const formValue = this.womanForm.getRawValue();
-    
-    const newWoman: Omit<Woman, 'id'> = {
-      name: formValue.name,
-      avatar: formValue.avatar,
-      email: formValue.email,
-      dateOfBirth: formValue.dateofbirth, // Map form control to C# camelCase model
-      age: Number(formValue.age) || 0,
-      status: formValue.status,
-      country: formValue.country,
-      race: formValue.race
-    };
+    if (this.womanForm.valid) {
+      const formValue = this.womanForm.getRawValue();
+      
+      const newWoman: Omit<Woman, 'id'> = {
+        name: formValue.name,
+        avatar: formValue.avatar,
+        email: formValue.email,
+        dateOfBirth: formValue.dateofbirth,
+        age: Number(formValue.age) || 0,
+        status: formValue.status,
+        country: formValue.country,
+        race: formValue.race
+      };
+
+      this.pendingFormData.set(newWoman);
+      this.showAddModal.set(true);
+    }
+  }
+
+  // Execute creation after confirmation
+  confirmAddWoman(): void {
+    const newWoman = this.pendingFormData();
+    if (!newWoman) return;
 
     this.womanService.createWoman(newWoman).subscribe({
       next: (created) => {
         this.women.update(current => [...current, created]);
         this.womanForm.reset({ status: 'Single' });
+        this.cancelAdd();
       },
-      error: (err) => console.error('Failed to create record:', err)
+      error: (err) => {
+        console.error('Failed to create record:', err);
+        this.cancelAdd();
+      }
     });
   }
-  }
 
+  cancelAdd(): void {
+    this.showAddModal.set(false);
+    this.pendingFormData.set(null);
+  }
 }
