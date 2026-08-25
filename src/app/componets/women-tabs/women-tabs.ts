@@ -32,7 +32,7 @@ export class WomenTabs {
     this.women().filter(woman => woman.race === 'Asian' )
   );
   caucasianWomen = computed(() => 
-    this.women().filter(woman => woman.race === 'White' || woman.race === 'Caucasian' || woman.race === 'Caucasian / White')
+    this.women().filter(woman => woman.race === 'White' || woman.race === 'Caucasian' || woman.race === 'White / Caucasian')
   );
   indigenousWomen = computed(() => 
     this.women().filter(woman => woman.race === 'Indigenous' || woman.race === 'Native' || woman.race === 'Native American'|| woman.race === 'Alaskan Native' || woman.race === 'American Indian' || woman.race === 'American Indian or Alaska Native') 
