@@ -8,8 +8,8 @@ import { CreateRateDto, WomanRatingSummaryDto } from '../components/models/woman
 })
 export class WomanRatesService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'https://localhost:7099/api/WomanRates';
-
+  //private readonly apiUrl = 'https://localhost:7099/api/WomanRates';
+  private readonly apiUrl = 'https://womenapi.onrender.com/api/WomanRates';
   // GET: api/WomanRates/averages
   getAllAverageRates(): Observable<WomanRatingSummaryDto[]> {
     return this.http.get<WomanRatingSummaryDto[]>(`${this.apiUrl}/averages`);
