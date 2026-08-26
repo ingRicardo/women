@@ -10,9 +10,10 @@ export class WomanService {
   private http = inject(HttpClient);
 
   // Update URL/port to match your ASP.NET Core API configuration
-  private apiUrl = 'https://localhost:7099/api/Women';
-  private rateApiUrl = 'https://localhost:7099/api/WomanRates';
-
+  //private apiUrl = 'https://localhost:7099/api/Women';
+  private apiUrl = 'https://womenapi.onrender.com/api/Women';
+  //private rateApiUrl = 'https://localhost:7099/api/WomanRates';
+  private rateApiUrl = 'https://womenapi.onrender.com/api/WomanRates';
   // --- CRUD Operations ---
 
   getWomen(): Observable<Woman[]> {

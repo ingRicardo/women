@@ -16,7 +16,9 @@ export interface User {
 })
 export class UserService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://localhost:7099/api/Users'; // Update port to match your API
+  //private apiUrl = 'https://localhost:7099/api/Users'; // Update port to match your API
+
+  private apiUrl = 'https://womenapi.onrender.com/api/Users';
 
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(this.apiUrl);

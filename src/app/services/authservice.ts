@@ -12,8 +12,8 @@ export interface LoginCredentials {
 export class Authservice {
   
   private http = inject(HttpClient);
-  private apiUrl = 'https://localhost:7099/api/Auth'; // Adjust endpoint URL/port as needed
-
+  //private apiUrl = 'https://localhost:7099/api/Auth'; // Adjust endpoint URL/port as needed
+  private apiUrl = 'https://womenapi.onrender.com/api/Auth'; // Adjust endpoint URL/port as needed
   // Signal storing currently logged-in user state
   currentUser = signal<User | null>(null);
 
