@@ -33,7 +33,7 @@ export class Login {
   isRegistering = signal(false);
   successMessage = signal<string | null>(null);
   errorMessage = signal<string>('');
-  isLoading = signal<boolean>(false); // Added loading indicator signal
+  isLoading = signal<boolean>(false);
 
   registerModel = signal<RegisterData>({
     user: '',
@@ -48,7 +48,6 @@ export class Login {
     password: '',
   });
 
-  // Signal Forms
   registerForm = form(this.registerModel, (schemaPath) => {
     required(schemaPath.user, { message: 'user is required' });
     required(schemaPath.password, { message: 'Password is required' });
@@ -61,21 +60,19 @@ export class Login {
     required(schemaPath.password, { message: 'Password is required' });
   });
 
-  username = signal('');
-  password = signal('');
   isAdmin = signal(false);
   errorMessageUpper = computed(() => this.errorMessage().toUpperCase());
-  isUserFound = signal(false);
 
   toggleMode() {
+    if (this.isLoading()) return;
     this.isRegistering.update((val) => !val);
     this.errorMessage.set('');
     this.successMessage.set(null);
   }
 
-  // Resilient Register Submit
   onRegisterSubmit(event: Event) {
     event.preventDefault();
+    if (this.isLoading()) return;
 
     this.errorMessage.set('');
     this.successMessage.set(null);
@@ -92,23 +89,25 @@ export class Login {
     }
 
     const newUser = { name, username, password, email, role };
-
     this.isLoading.set(true);
 
     this.userService
       .createUser(newUser)
       .pipe(
-        // Allow up to 30 seconds for Render free instance cold-starts
-        timeout(30000),
-        // Retry twice with a 2-second delay if server fails to wake up on first attempt
-        retry({ count: 2, delay: 2000 }),
+       // 1. Retry up to 3 times BEFORE triggering timeout
+        retry({
+          count: 3,
+          delay: 3000,
+        }),
+        // 2. Allow up to 60 seconds total for the backend to finish booting
+        timeout(60000),
         catchError((err) => {
           this.isLoading.set(false);
           return throwError(() => err);
         })
       )
       .subscribe({
-        next: (createdUser) => {
+        next: () => {
           this.isLoading.set(false);
           this.successMessage.set('User created successfully!');
           this.registerModel.set({ user: '', email: '', password: '', role: '', name: '' });
@@ -127,75 +126,66 @@ export class Login {
       });
   }
 
-  // Resilient Login Submit
-onSubmit(event: Event): void {
-  event.preventDefault();
-  this.errorMessage.set('');
-  this.isAdmin.set(false);
+  onSubmit(event: Event): void {
+    event.preventDefault();
+    if (this.isLoading()) return;
 
-  const username = this.loginForm.user().value().trim();
-  const password = this.loginForm.password().value();
+    this.errorMessage.set('');
+    this.isAdmin.set(false);
 
-  if (!username || !password) {
-    this.errorMessage.set('Please enter both username and password.');
-    return;
+    const username = this.loginForm.user().value().trim();
+    const password = this.loginForm.password().value();
+
+    if (!username || !password) {
+      this.errorMessage.set('Please enter both username and password.');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    this.authService
+      .login({ username, password })
+      .pipe(
+        retry({ count: 3, delay: 3000 }),
+        timeout(60000),
+        catchError((err) => {
+          this.isLoading.set(false);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: (user) => {
+          this.isLoading.set(false);
+          const isAdminUser = user.role?.toUpperCase() === 'ADMIN';
+          this.isAdmin.set(isAdminUser);
+
+          if (isAdminUser) {
+            this.redirectToAdminSection(user);
+          } else {
+            this.redirectToPublicSection(user);
+          }
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+
+          if (err.name === 'TimeoutError' || err.message?.includes('Timeout')) {
+            this.errorMessage.set(
+              'The server is taking longer than expected to wake up. Please click Login again.'
+            );
+          } else if (err.status === 404) {
+            this.errorMessage.set('User not found. Please check your credentials.');
+          } else if (err.status === 401) {
+            this.errorMessage.set('Invalid credentials. Please try again.');
+          } else {
+            this.errorMessage.set('Unable to log in. Please check backend logs.');
+          }
+        },
+      });
   }
-
-  this.isLoading.set(true);
-
-  this.authService
-    .login({ username, password })
-    .pipe(
-      // 1. Retry up to 3 times BEFORE enforcing the timeout limit
-      retry({
-        count: 3,
-        delay: 3000, // Wait 3s between retries to give the container time to boot
-      }),
-      // 2. Allow up to 60 seconds total for cold-start containers to respond
-      timeout(60000),
-      catchError((err) => {
-        this.isLoading.set(false);
-        return throwError(() => err);
-      })
-    )
-    .subscribe({
-      next: (user) => {
-        this.isLoading.set(false);
-        const isAdminUser = user.role?.toUpperCase() === 'ADMIN';
-        this.isAdmin.set(isAdminUser);
-
-        if (isAdminUser) {
-          this.redirectToAdminSection(user);
-        } else {
-          this.redirectToPublicSection(user);
-        }
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-
-        // Check if the error is an RxJS TimeoutError
-        if (err.name === 'TimeoutError' || err.message?.includes('Timeout')) {
-          this.errorMessage.set(
-            'The server is taking longer than expected to wake up. Please click Login again.'
-          );
-        } else if (err.status === 404) {
-          this.errorMessage.set('User not found. Please check your credentials.');
-        } else if (err.status === 401) {
-          this.errorMessage.set('Invalid credentials. Please try again.');
-        } else {
-          this.errorMessage.set('Unable to log in. Please check backend logs.');
-        }
-      },
-    });
-}
 
   dismissSuccess() {
     this.successMessage.set(null);
     this.toggleMode();
-  }
-
-  onRegister() {
-    throw new Error('Method not implemented.');
   }
 
   redirectToAdminSection(user: any) {
