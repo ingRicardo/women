@@ -17,10 +17,10 @@
 }
 
 <div class="custom-table" [class.is-busy]="isLoading()">
-  <div class="controls">
+  <!-- Flex Controls -->
+  <div class="controls-bar">
     <input 
       [class.custom-input]="true"
-      [style.font-size.px]="16"
       type="text" 
       class="search-input"
       placeholder="Filter by name..." 
@@ -28,75 +28,80 @@
       (input)="handleSearch($event)" 
       [disabled]="isLoading()"
     />
+    <button 
+      class="add-btn" 
+      (click)="openAddModal()" 
+      [disabled]="isLoading()">
+      + Add New Record
+    </button>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Username</th>
-        <th>Password</th>
-        <th>Role</th>
-        <th>Email</th>
-        <th></th>
-        <th>
-          <button 
-            class="add-btn" 
-            (click)="openAddModal()" 
-            [disabled]="isLoading()">
-            + Add New Record
-          </button>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      @if (isLoading() && paginatedUsers().length === 0) {
+  <!-- Responsive Table Wrapper -->
+  <div class="table-container">
+    <table>
+      <thead>
         <tr>
-          <td colspan="8" class="loading-cell">
-            <div class="spinner-container">
-              <span class="spinner"></span>
-              <p>Fetching users from server...</p>
-            </div>
-          </td>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Password</th>
+          <th>Role</th>
+          <th>Email</th>
+          <th colspan="2" class="text-center">Actions</th>
         </tr>
-      } @else {
-        @for (user of paginatedUsers(); track user.id) {
+      </thead>
+      <tbody>
+        @if (isLoading() && paginatedUsers().length === 0) {
           <tr>
-            <td>{{ user.id }}</td>
-            <td>{{ user.name }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.password }}</td>
-            <td>{{ user.role }}</td>
-            <td>{{ user.email }}</td>
-            <td>
-              <button (click)="openEditModal(user)" [disabled]="isLoading()">Edit</button>
-            </td>
-            <td>
-              <button 
-                class="delete-btn" 
-                (click)="confirmDelete(user)" 
-                [disabled]="isLoading()">
-                Delete
-              </button>
+            <td colspan="8" class="loading-cell">
+              <div class="spinner-container">
+                <span class="spinner"></span>
+                <p>Fetching users from server...</p>
+              </div>
             </td>
           </tr>
-        } @empty {
-          <tr><td colspan="8">No items match your filter criteria.</td></tr>
+        } @else {
+          @for (user of paginatedUsers(); track user.id) {
+            <tr>
+              <td>{{ user.id }}</td>
+              <td class="font-medium">{{ user.name }}</td>
+              <td>&#64;{{ user.username }}</td>
+              <td class="masked-text">{{ user.password }}</td>
+              <td><span class="role-badge">{{ user.role }}</span></td>
+              <td class="truncate-cell">{{ user.email }}</td>
+              <td class="action-cell">
+                <button class="btn-edit" (click)="openEditModal(user)" [disabled]="isLoading()">Edit</button>
+              </td>
+              <td class="action-cell">
+                <button 
+                  class="delete-btn" 
+                  (click)="confirmDelete(user)" 
+                  [disabled]="isLoading()">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="8" class="empty-cell">No items match your filter criteria.</td></tr>
+          }
         }
-      }
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </div>
 
   <!-- Pagination Toolbar -->
   <div class="pagination-controls">
-    <button (click)="goToPage(1)" [disabled]="currentPage() === 1 || isLoading()">«</button>
-    <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1 || isLoading()">‹ Prev</button>
+    <div class="page-buttons">
+      <button (click)="goToPage(1)" [disabled]="currentPage() === 1 || isLoading()">«</button>
+      <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1 || isLoading()">‹ Prev</button>
+    </div>
     
-    <span>Page {{ currentPage() }} of {{ totalPages() }}</span>
+    <span class="page-info">Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong></span>
     
-    <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages() || isLoading()">Next ›</button>
-    <button (click)="goToPage(totalPages())" [disabled]="currentPage() === totalPages() || isLoading()">»</button>
+    <div class="page-buttons">
+      <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages() || isLoading()">Next ›</button>
+      <button (click)="goToPage(totalPages())" [disabled]="currentPage() === totalPages() || isLoading()">»</button>
+    </div>
   </div>
 
   @if (selectedRecord()) {
