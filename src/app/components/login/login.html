@@ -51,8 +51,8 @@
           Role:
           <select [formField]="registerForm.role">
             <option value="" disabled selected>Select a role</option>
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
+            <option value="USER">User</option>
+            <option value="ADMIN">Admin</option>
           </select>
         </label>
         @if (registerForm.role().touched() && registerForm.role().invalid()) {
