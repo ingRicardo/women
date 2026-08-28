@@ -2,6 +2,7 @@ import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Editmodal } from '../editmodal/editmodal';
 import { UserService, User } from '../../services/user.service';
+import { retry, timeout, catchError, throwError } from 'rxjs';
 
 export interface NotificationAlert {
   message: string;
@@ -25,6 +26,7 @@ export class Users implements OnInit {
   searchTerm = signal<string>('');
   currentPage = signal<number>(1);
   pageSize = signal<number>(5);
+  isLoading = signal<boolean>(false);
 
   // Feedback Notification State
   notification = signal<NotificationAlert | null>(null);
@@ -36,13 +38,36 @@ export class Users implements OnInit {
   }
 
   loadUsers(): void {
-    this.userService.getUsers().subscribe({
-      next: (data) => this.users.set(data),
-      error: (err) => {
-        console.error('Failed to load users', err);
-        this.showNotification('Failed to load user list from server.', 'error');
-      },
-    });
+    this.isLoading.set(true);
+
+    this.userService
+      .getUsers()
+      .pipe(
+        // Retry 3 times with 3s delays to accommodate Render cold-starts
+        retry({ count: 3, delay: 3000 }),
+        // Allow up to 60s total for container boot and query execution
+        timeout(60000),
+        catchError((err) => {
+          this.isLoading.set(false);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: (data) => {
+          this.isLoading.set(false);
+          this.users.set(data);
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          console.error('Failed to load users', err);
+          
+          if (err.name === 'TimeoutError') {
+            this.showNotification('Server is taking longer to wake up. Please refresh.', 'error');
+          } else {
+            this.showNotification('Failed to load user list from server.', 'error');
+          }
+        },
+      });
   }
 
   confirmDelete(user: User): void {
@@ -57,18 +82,32 @@ export class Users implements OnInit {
     const user = this.userToDelete();
     if (!user) return;
 
-    this.userService.deleteUser(user.id).subscribe({
-      next: () => {
-        this.users.update((current) => current.filter((u) => u.id !== user.id));
-        this.showNotification(`User "${user.name}" was successfully deleted.`, 'success');
-        this.userToDelete.set(null);
-      },
-      error: (err) => {
-        console.error('Failed to delete user', err);
-        this.showNotification(`Could not delete "${user.name}". Please try again.`, 'error');
-        this.userToDelete.set(null);
-      },
-    });
+    this.isLoading.set(true);
+
+    this.userService
+      .deleteUser(user.id)
+      .pipe(
+        retry({ count: 2, delay: 2000 }),
+        timeout(30000),
+        catchError((err) => {
+          this.isLoading.set(false);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.isLoading.set(false);
+          this.users.update((current) => current.filter((u) => u.id !== user.id));
+          this.showNotification(`User "${user.name}" was successfully deleted.`, 'success');
+          this.userToDelete.set(null);
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          console.error('Failed to delete user', err);
+          this.showNotification(`Could not delete "${user.name}". Please try again.`, 'error');
+          this.userToDelete.set(null);
+        },
+      });
   }
 
   openAddModal(): void {
@@ -80,35 +119,69 @@ export class Users implements OnInit {
   }
 
   saveRecord(submittingItem: User): void {
+    this.isLoading.set(true);
+
     if (!submittingItem.id || submittingItem.id === 0) {
       // CREATE
       const { id, ...newUserData } = submittingItem;
-      this.userService.createUser(newUserData).subscribe({
-        next: (createdUser) => {
-          this.users.update((current) => [...current, createdUser]);
-          this.closeModal();
-          this.showNotification(`User "${createdUser.name}" created successfully!`, 'success');
-        },
-        error: (err) => {
-          console.error('Failed to create user', err);
-          this.showNotification('Failed to create user. Please check your network or inputs.', 'error');
-        },
-      });
+
+      this.userService
+        .createUser(newUserData)
+        .pipe(
+          retry({ count: 3, delay: 3000 }),
+          timeout(60000),
+          catchError((err) => {
+            this.isLoading.set(false);
+            return throwError(() => err);
+          })
+        )
+        .subscribe({
+          next: (createdUser) => {
+            this.isLoading.set(false);
+            this.users.update((current) => [...current, createdUser]);
+            this.closeModal();
+            this.showNotification(`User "${createdUser.name}" created successfully!`, 'success');
+          },
+          error: (err) => {
+            this.isLoading.set(false);
+            console.error('Failed to create user', err);
+            
+            if (err.status === 409) {
+              this.showNotification('Username or email already exists.', 'error');
+            } else if (err.name === 'TimeoutError') {
+              this.showNotification('Server response timed out. Please check again.', 'error');
+            } else {
+              this.showNotification('Failed to create user. Please check inputs or connection.', 'error');
+            }
+          },
+        });
     } else {
       // UPDATE
-      this.userService.updateUser(submittingItem.id, submittingItem).subscribe({
-        next: () => {
-          this.users.update((current) =>
-            current.map((u) => (u.id === submittingItem.id ? submittingItem : u))
-          );
-          this.closeModal();
-          this.showNotification(`User "${submittingItem.name}" updated successfully!`, 'success');
-        },
-        error: (err) => {
-          console.error('Failed to update user', err);
-          this.showNotification('Failed to update user. Please try again.', 'error');
-        },
-      });
+      this.userService
+        .updateUser(submittingItem.id, submittingItem)
+        .pipe(
+          retry({ count: 2, delay: 2000 }),
+          timeout(30000),
+          catchError((err) => {
+            this.isLoading.set(false);
+            return throwError(() => err);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.isLoading.set(false);
+            this.users.update((current) =>
+              current.map((u) => (u.id === submittingItem.id ? submittingItem : u))
+            );
+            this.closeModal();
+            this.showNotification(`User "${submittingItem.name}" updated successfully!`, 'success');
+          },
+          error: (err) => {
+            this.isLoading.set(false);
+            console.error('Failed to update user', err);
+            this.showNotification('Failed to update user. Please try again.', 'error');
+          },
+        });
     }
   }
 
@@ -122,7 +195,6 @@ export class Users implements OnInit {
     }
     this.notification.set({ message, type });
 
-    // Auto-dismiss notification after 4 seconds
     this.notificationTimeout = setTimeout(() => {
       this.dismissNotification();
     }, 4000);
