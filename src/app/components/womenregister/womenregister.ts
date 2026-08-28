@@ -34,17 +34,16 @@ export interface NotificationAlert {
 })
 export class Womenregister implements OnInit {
 
-  // Add these signals to your component class:
-isLoadingWomen = signal<boolean>(false);
-isLoadingStats = signal<boolean>(false);
-isSubmitting = signal<boolean>(false);
-isDeleting = signal<boolean>(false);
-isDeletingId = signal<number | null>(null);
+  // Signals synced with template control flow
+  isLoadingWomen = signal<boolean>(true);
+  isLoadingStats = signal<boolean>(false);
+  isSubmitting = signal<boolean>(false);
+  isDeleting = signal<boolean>(false);
+  isDeletingId = signal<number | null>(null);
 
   womanForm: FormGroup;
   private womanService = inject(WomanService);
   women = signal<Woman[]>([]);
-  isLoading = signal<boolean>(false);
 
   // Notification State
   notification = signal<NotificationAlert | null>(null);
@@ -62,7 +61,8 @@ isDeletingId = signal<number | null>(null);
   }
 
   loadWomen(): void {
-    this.isLoading.set(true);
+    this.isLoadingWomen.set(true);
+    this.isLoadingStats.set(true);
 
     this.womanService
       .getWomen()
@@ -70,17 +70,20 @@ isDeletingId = signal<number | null>(null);
         retry({ count: 3, delay: 3000 }),
         timeout(60000),
         catchError((err) => {
-          this.isLoading.set(false);
+          this.isLoadingWomen.set(false);
+          this.isLoadingStats.set(false);
           return throwError(() => err);
         })
       )
       .subscribe({
         next: (data) => {
-          this.isLoading.set(false);
           this.women.set(data);
+          this.isLoadingWomen.set(false);
+          this.isLoadingStats.set(false);
         },
         error: (err) => {
-          this.isLoading.set(false);
+          this.isLoadingWomen.set(false);
+          this.isLoadingStats.set(false);
           console.error('Error fetching women records:', err);
           if (err.name === 'TimeoutError') {
             this.showNotification('Server response timed out. Please try refreshing.', 'error');
@@ -254,7 +257,8 @@ isDeletingId = signal<number | null>(null);
     const id = this.pendingDeleteId();
     if (id === null) return;
 
-    this.isLoading.set(true);
+    this.isDeleting.set(true);
+    this.isDeletingId.set(id);
 
     this.womanService
       .deleteWoman(id)
@@ -262,13 +266,15 @@ isDeletingId = signal<number | null>(null);
         retry({ count: 2, delay: 2000 }),
         timeout(30000),
         catchError((err) => {
-          this.isLoading.set(false);
+          this.isDeleting.set(false);
+          this.isDeletingId.set(null);
           return throwError(() => err);
         })
       )
       .subscribe({
         next: () => {
-          this.isLoading.set(false);
+          this.isDeleting.set(false);
+          this.isDeletingId.set(null);
           this.women.update((list) => list.filter((woman) => woman.id !== id));
 
           if (this.currentPage() > this.totalPages() && this.totalPages() > 0) {
@@ -278,7 +284,8 @@ isDeletingId = signal<number | null>(null);
           this.cancelDelete();
         },
         error: (err) => {
-          this.isLoading.set(false);
+          this.isDeleting.set(false);
+          this.isDeletingId.set(null);
           console.error(`Failed to delete record with ID ${id}:`, err);
           if (err.name === 'TimeoutError') {
             this.showNotification('Delete request timed out.', 'error');
@@ -321,7 +328,7 @@ isDeletingId = signal<number | null>(null);
     const newWoman = this.pendingFormData();
     if (!newWoman) return;
 
-    this.isLoading.set(true);
+    this.isSubmitting.set(true);
 
     this.womanService
       .createWoman(newWoman)
@@ -329,20 +336,20 @@ isDeletingId = signal<number | null>(null);
         retry({ count: 2, delay: 2000 }),
         timeout(30000),
         catchError((err) => {
-          this.isLoading.set(false);
+          this.isSubmitting.set(false);
           return throwError(() => err);
         })
       )
       .subscribe({
         next: (created) => {
-          this.isLoading.set(false);
+          this.isSubmitting.set(false);
           this.women.update((current) => [...current, created]);
           this.womanForm.reset({ status: 'Single' });
           this.showNotification('New record added successfully.', 'success');
           this.cancelAdd();
         },
         error: (err) => {
-          this.isLoading.set(false);
+          this.isSubmitting.set(false);
           console.error('Failed to create record:', err);
           if (err.name === 'TimeoutError') {
             this.showNotification('Create request timed out.', 'error');
