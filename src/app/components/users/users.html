@@ -1,4 +1,11 @@
-<h4>Users</h4>
+<h4>
+  Users
+  @if (isLoading()) {
+    <span class="loading-badge">
+      <span class="spinner-small"></span> Loading...
+    </span>
+  }
+</h4>
 
 <!-- Floating Notification Alert -->
 @if (notification(); as alert) {
@@ -9,7 +16,7 @@
   </div>
 }
 
-<div class="custom-table">
+<div class="custom-table" [class.is-busy]="isLoading()">
   <div class="controls">
     <input 
       [class.custom-input]="true"
@@ -19,6 +26,7 @@
       placeholder="Filter by name..." 
       [value]="searchTerm()"
       (input)="handleSearch($event)" 
+      [disabled]="isLoading()"
     />
   </div>
 
@@ -33,41 +41,62 @@
         <th>Email</th>
         <th></th>
         <th>
-          <button class="add-btn" (click)="openAddModal()">+ Add New Record</button>
+          <button 
+            class="add-btn" 
+            (click)="openAddModal()" 
+            [disabled]="isLoading()">
+            + Add New Record
+          </button>
         </th>
       </tr>
     </thead>
     <tbody>
-      @for (user of paginatedUsers(); track user.id) {
+      @if (isLoading() && paginatedUsers().length === 0) {
         <tr>
-          <td>{{ user.id }}</td>
-          <td>{{ user.name }}</td>
-          <td>{{ user.username }}</td>
-          <td>{{ user.password }}</td>
-          <td>{{ user.role }}</td>
-          <td>{{ user.email }}</td>
-          <td>
-            <button (click)="openEditModal(user)">Edit</button>
-          </td>
-          <td>
-            <button class="delete-btn" (click)="confirmDelete(user)">Delete</button>
+          <td colspan="8" class="loading-cell">
+            <div class="spinner-container">
+              <span class="spinner"></span>
+              <p>Fetching users from server...</p>
+            </div>
           </td>
         </tr>
-      } @empty {
-        <tr><td colspan="8">No items match your filter criteria.</td></tr>
+      } @else {
+        @for (user of paginatedUsers(); track user.id) {
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.password }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <button (click)="openEditModal(user)" [disabled]="isLoading()">Edit</button>
+            </td>
+            <td>
+              <button 
+                class="delete-btn" 
+                (click)="confirmDelete(user)" 
+                [disabled]="isLoading()">
+                Delete
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="8">No items match your filter criteria.</td></tr>
+        }
       }
     </tbody>
   </table>
 
   <!-- Pagination Toolbar -->
   <div class="pagination-controls">
-    <button (click)="goToPage(1)" [disabled]="currentPage() === 1">«</button>
-    <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1">‹ Prev</button>
+    <button (click)="goToPage(1)" [disabled]="currentPage() === 1 || isLoading()">«</button>
+    <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1 || isLoading()">‹ Prev</button>
     
     <span>Page {{ currentPage() }} of {{ totalPages() }}</span>
     
-    <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()">Next ›</button>
-    <button (click)="goToPage(totalPages())" [disabled]="currentPage() === totalPages()">»</button>
+    <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages() || isLoading()">Next ›</button>
+    <button (click)="goToPage(totalPages())" [disabled]="currentPage() === totalPages() || isLoading()">»</button>
   </div>
 
   @if (selectedRecord()) {
@@ -87,8 +116,14 @@
         <p class="warning-text">This action cannot be undone.</p>
         
         <div class="modal-actions">
-          <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
-          <button class="btn-confirm-delete" (click)="executeDelete()">Yes, Delete</button>
+          <button class="btn-cancel" (click)="cancelDelete()" [disabled]="isLoading()">Cancel</button>
+          <button class="btn-confirm-delete" (click)="executeDelete()" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="spinner-small"></span> Deleting...
+            } @else {
+              Yes, Delete
+            }
+          </button>
         </div>
       </div>
     </div>
