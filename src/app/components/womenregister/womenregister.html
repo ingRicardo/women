@@ -1,10 +1,18 @@
 <div>
   <!-- Registration Section -->
-  <section>
+  <section class="relative-container">
     <div class="header-title">
       <h2>Register Woman</h2>
       <p>Add a new profile to the roster</p>
     </div>
+
+    <!-- Form Processing Overlay -->
+    @if (isSubmitting()) {
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <span>Registering woman profile...</span>
+      </div>
+    }
 
     <form [formGroup]="womanForm" (ngSubmit)="onSubmit()" class="form-grid">
       <!-- Avatar Image URL Field with Live Preview -->
@@ -87,8 +95,12 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" [disabled]="womanForm.invalid" class="btn-primary">
-          Register Woman
+        <button type="submit" [disabled]="womanForm.invalid || isSubmitting()" class="btn-primary">
+          @if (isSubmitting()) {
+            <span class="btn-spinner"></span> Processing...
+          } @else {
+            Register Woman
+          }
         </button>
       </div>
     </form>
@@ -96,7 +108,8 @@
 
   <br />
 
-  <div>
+  <!-- Roster Section -->
+  <div class="relative-container">
     <header class="table-header">
       <div class="title-group">
         <h2>Woman Roster</h2>
@@ -108,6 +121,7 @@
         [value]="searchQuery()" 
         (input)="onSearch($event)"
         class="search-input"
+        [disabled]="isLoadingWomen()"
       />
     </header>
 
@@ -127,47 +141,62 @@
           </tr>
         </thead>
         <tbody>
-          @for (woman of paginatedWomen(); track woman.id) {
+          @if (isLoadingWomen()) {
             <tr>
-              <td class="muted">#{{ woman.id }}</td>
-              <td>
-                <div class="user-profile-cell">
-                  <img 
-                    [src]="woman.avatar" 
-                    [alt]="woman.name + ' avatar'" 
-                    class="avatar-img"
-                    loading="lazy"
-                  />
-                  <span class="font-semibold">{{ woman.name }}</span>
+              <td colspan="9" class="loading-state">
+                <div class="loading-flex">
+                  <span class="spinner"></span> Loading roster data...
                 </div>
               </td>
-              <td>{{ woman.age }}</td>
-              <td>
-                <span class="status-badge" [class.single]="woman.status === 'Single'">
-                  {{ woman.status }}
-                </span>
-              </td>
-              <td>{{ woman.dateOfBirth | date:'yyyy-MM-dd' }}</td>
-              <td>{{ woman.country }}</td>
-              <td>{{ woman.race }}</td>
-              <td>
-                <a [href]="'mailto:' + woman.email" class="email-link">{{ woman.email }}</a>
-              </td>
-              <td class="text-right">
-                <button 
-                  type="button" 
-                  class="btn-delete" 
-                  (click)="promptRemoveWoman(woman.id)" 
-                  aria-label="Delete user"
-                >
-                  Delete
-                </button>
-              </td>
             </tr>
-          } @empty {
-            <tr>
-              <td colspan="9" class="empty-state">No users matching your criteria.</td>
-            </tr>
+          } @else {
+            @for (woman of paginatedWomen(); track woman.id) {
+              <tr>
+                <td class="muted">#{{ woman.id }}</td>
+                <td>
+                  <div class="user-profile-cell">
+                    <img 
+                      [src]="woman.avatar" 
+                      [alt]="woman.name + ' avatar'" 
+                      class="avatar-img"
+                      loading="lazy"
+                    />
+                    <span class="font-semibold">{{ woman.name }}</span>
+                  </div>
+                </td>
+                <td>{{ woman.age }}</td>
+                <td>
+                  <span class="status-badge" [class.single]="woman.status === 'Single'">
+                    {{ woman.status }}
+                  </span>
+                </td>
+                <td>{{ woman.dateOfBirth | date:'yyyy-MM-dd' }}</td>
+                <td>{{ woman.country }}</td>
+                <td>{{ woman.race }}</td>
+                <td>
+                  <a [href]="'mailto:' + woman.email" class="email-link">{{ woman.email }}</a>
+                </td>
+                <td class="text-right">
+                  <button 
+                    type="button" 
+                    class="btn-delete" 
+                    (click)="promptRemoveWoman(woman.id)" 
+                    [disabled]="isDeletingId() === woman.id"
+                    aria-label="Delete user"
+                  >
+                    @if (isDeletingId() === woman.id) {
+                      <span class="btn-spinner"></span>
+                    } @else {
+                      Delete
+                    }
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="9" class="empty-state">No users matching your criteria.</td>
+              </tr>
+            }
           }
         </tbody>
       </table>
@@ -181,6 +210,7 @@
           id="pageSize" 
           [value]="pageSize()" 
           (change)="onPageSizeChange($event)"
+          [disabled]="isLoadingWomen()"
         >
           <option [value]="5">5</option>
           <option [value]="10">10</option>
@@ -198,7 +228,7 @@
         <button 
           type="button" 
           class="btn-page" 
-          [disabled]="currentPage() === 1" 
+          [disabled]="currentPage() === 1 || isLoadingWomen()" 
           (click)="goToPage(currentPage() - 1)"
         >
           Previous
@@ -209,6 +239,7 @@
             type="button" 
             class="btn-page page-num" 
             [class.active]="page === currentPage()" 
+            [disabled]="isLoadingWomen()"
             (click)="goToPage(page)"
           >
             {{ page }}
@@ -218,7 +249,7 @@
         <button 
           type="button" 
           class="btn-page" 
-          [disabled]="currentPage() >= totalPages() || totalPages() === 0" 
+          [disabled]="currentPage() >= totalPages() || totalPages() === 0 || isLoadingWomen()" 
           (click)="goToPage(currentPage() + 1)"
         >
           Next
@@ -230,7 +261,14 @@
   <h3>statistics</h3>
 
   <!-- Status Statistics Bar -->
-  <section class="stats-bar">
+  <section class="stats-bar relative-container">
+    @if (isLoadingStats()) {
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <span>Updating statistics...</span>
+      </div>
+    }
+
     <div class="stats-header">
       <h3>Status Overview</h3>
       <span class="total-count">Total: {{ women().length }} Users</span>
@@ -256,7 +294,14 @@
   </section>
 
   <!-- Race Statistics Donut Circle -->
-  <section class="circle-stats-section">
+  <section class="circle-stats-section relative-container">
+    @if (isLoadingStats()) {
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <span>Calculating race distribution...</span>
+      </div>
+    }
+
     <div class="stats-header">
       <h3>Race Distribution</h3>
     </div>
@@ -311,7 +356,7 @@
 
   <!-- Delete Confirmation Modal -->
   @if (showDeleteModal()) {
-    <div class="modal-backdrop" (click)="cancelDelete()">
+    <div class="modal-backdrop" (click)="!isDeleting() && cancelDelete()">
       <div class="modal-card danger-modal" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <div class="modal-icon danger-icon">⚠️</div>
@@ -322,8 +367,14 @@
           <p class="sub-text">This action cannot be undone.</p>
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn-cancel" (click)="cancelDelete()">Cancel</button>
-          <button type="button" class="btn-confirm-delete" (click)="confirmRemoveWoman()">Delete Record</button>
+          <button type="button" class="btn-cancel" [disabled]="isDeleting()" (click)="cancelDelete()">Cancel</button>
+          <button type="button" class="btn-confirm-delete" [disabled]="isDeleting()" (click)="confirmRemoveWoman()">
+            @if (isDeleting()) {
+              <span class="btn-spinner"></span> Deleting...
+            } @else {
+              Delete Record
+            }
+          </button>
         </div>
       </div>
     </div>
@@ -331,7 +382,7 @@
 
   <!-- Add Confirmation Modal -->
   @if (showAddModal()) {
-    <div class="modal-backdrop" (click)="cancelAdd()">
+    <div class="modal-backdrop" (click)="!isSubmitting() && cancelAdd()">
       <div class="modal-card info-modal" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <div class="modal-icon info-icon">👤</div>
@@ -346,8 +397,14 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn-cancel" (click)="cancelAdd()">Cancel</button>
-          <button type="button" class="btn-confirm-add" (click)="confirmAddWoman()">Confirm & Register</button>
+          <button type="button" class="btn-cancel" [disabled]="isSubmitting()" (click)="cancelAdd()">Cancel</button>
+          <button type="button" class="btn-confirm-add" [disabled]="isSubmitting()" (click)="confirmAddWoman()">
+            @if (isSubmitting()) {
+              <span class="btn-spinner"></span> Registering...
+            } @else {
+              Confirm & Register
+            }
+          </button>
         </div>
       </div>
     </div>

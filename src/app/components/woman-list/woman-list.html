@@ -1,37 +1,63 @@
-<div class="woman-card-grid">
-  @for (woman of women(); track woman.id) {
-    <div class="woman-card">
-      <!-- Avatar Image Display -->
-      <div class="avatar-container">
-        <img 
-          [src]="woman.avatar || 'assets/default-avatar.png'" 
-          [alt]="woman.name" 
-          class="avatar-img"
-          (error)="$any($event.target).src = 'assets/default-avatar.png'" 
-        />
-      </div>
+<!-- Floating Notification Alert -->
+@if (notification(); as alert) {
+  <div class="toast-alert" [ngClass]="alert.type">
+    <span class="toast-icon">{{ alert.type === 'success' ? '✅' : '❌' }}</span>
+    <span class="toast-message">{{ alert.message }}</span>
+    <button class="toast-close" (click)="dismissNotification()">✕</button>
+  </div>
+}
 
-      <div class="woman-details">
-        <h3>{{ woman.name }}</h3>
-        <p class="meta">{{ woman.country }} • {{ woman.age ? woman.age + ' yrs' : 'N/A' }}</p>
-
-        <!-- Rating Summary -->
-        @let summary = ratingsMap().get(woman.id);
-        <div class="rating-badge">
-          <span class="stars">★ {{ summary?.averageRate ?? 0 }} / 5</span>
-          <span class="count">({{ summary?.totalRatings ?? 0 }} ratings)</span>
+<!-- Initial Full-Page / Grid Loading Spinner -->
+@if (isLoading() && women().length === 0) {
+  <div class="loading-container">
+    <span class="spinner"></span>
+    <p>Fetching profiles from server...</p>
+  </div>
+} @else {
+  <div class="woman-card-grid" [class.is-busy]="isLoading()">
+    @for (woman of women(); track woman.id) {
+      <div class="woman-card">
+        <!-- Avatar Image Display -->
+        <div class="avatar-container">
+          <img 
+            [src]="woman.avatar || 'assets/default-avatar.png'" 
+            [alt]="woman.name" 
+            class="avatar-img"
+            (error)="$any($event.target).src = 'assets/default-avatar.png'" 
+          />
         </div>
 
-        <button class="btn-rate" (click)="openRateModal(woman)">+ Add Rating</button>
+        <div class="woman-details">
+          <h3>{{ woman.name }}</h3>
+          <p class="meta">{{ woman.country }} • {{ woman.age ? woman.age + ' yrs' : 'N/A' }}</p>
+
+          <!-- Rating Summary -->
+          @let summary = ratingsMap().get(woman.id);
+          <div class="rating-badge">
+            <span class="stars">★ {{ summary?.averageRate ?? 0 }} / 5</span>
+            <span class="count">({{ summary?.totalRatings ?? 0 }} ratings)</span>
+          </div>
+
+          <button 
+            class="btn-rate" 
+            (click)="openRateModal(woman)" 
+            [disabled]="isLoading()">
+            + Add Rating
+          </button>
+        </div>
       </div>
-    </div>
-  }
-</div>
+    } @empty {
+      <div class="empty-state">
+        <p>No profiles found.</p>
+      </div>
+    }
+  </div>
+}
 
 <!-- Add Rating Modal -->
 @if (selectedWomanForRating(); as selectedWoman) {
-  <div class="modal-backdrop">
-    <div class="modal-card">
+  <div class="modal-backdrop" (click)="closeRateModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
       <h3>Rate {{ selectedWoman.name }}</h3>
       
       <div class="modal-body">
@@ -43,7 +69,11 @@
 
         <div class="rating-select">
           <label for="rate">Select Rating (1 to 5):</label>
-          <select id="rate" [ngModel]="selectedRate()" (ngModelChange)="selectedRate.set(+$event)">
+          <select 
+            id="rate" 
+            [ngModel]="selectedRate()" 
+            (ngModelChange)="selectedRate.set(+$event)"
+            [disabled]="isLoading()">
             <option [value]="5">5 - Excellent</option>
             <option [value]="4">4 - Good</option>
             <option [value]="3">3 - Average</option>
@@ -54,8 +84,23 @@
       </div>
 
       <div class="modal-actions">
-        <button (click)="closeRateModal()" class="btn-secondary">Cancel</button>
-        <button (click)="submitRating()" class="btn-primary">Submit Rating</button>
+        <button 
+          (click)="closeRateModal()" 
+          class="btn-secondary" 
+          [disabled]="isLoading()">
+          Cancel
+        </button>
+
+        <button 
+          (click)="submitRating()" 
+          class="btn-primary" 
+          [disabled]="isLoading()">
+          @if (isLoading()) {
+            <span class="spinner-small"></span> Submitting...
+          } @else {
+            Submit Rating
+          }
+        </button>
       </div>
     </div>
   </div>
