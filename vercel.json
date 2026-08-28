@@ -1,4 +1,5 @@
 {
+  "outputDirectory": "dist/women2/browser",
   "rewrites": [
     {
       "source": "/(.*)",
