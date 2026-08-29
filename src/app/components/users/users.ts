@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Editmodal } from '../editmodal/editmodal';
 import { UserService, User } from '../../services/user.service';
-import { retry, timeout, catchError, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 
 export interface NotificationAlert {
   message: string;
@@ -19,8 +19,9 @@ export interface NotificationAlert {
 export class Users implements OnInit {
   private userService = inject(UserService);
 
-  // Signal state
-  users = signal<User[]>([]);
+  // Directly bind component state to service read-only signal
+  users = this.userService.users;
+  
   selectedRecord = signal<User | null>(null);
   userToDelete = signal<User | null>(null);
   searchTerm = signal<string>('');
@@ -37,37 +38,41 @@ export class Users implements OnInit {
     this.loadUsers();
   }
 
-  loadUsers(): void {
+  loadUsers(forceRefresh = false): void {
+    // Avoid triggering loading spinner if data is already available
+    if (this.users().length > 0 && !forceRefresh) {
+      return;
+    }
+
     this.isLoading.set(true);
 
     this.userService
-      .getUsers()
+      .getUsers(forceRefresh)
       .pipe(
-        // Retry 3 times with 3s delays to accommodate Render cold-starts
-        retry({ count: 3, delay: 3000 }),
-        // Allow up to 60s total for container boot and query execution
-        timeout(60000),
         catchError((err) => {
           this.isLoading.set(false);
           return throwError(() => err);
         })
       )
       .subscribe({
-        next: (data) => {
+        next: () => {
           this.isLoading.set(false);
-          this.users.set(data);
         },
         error: (err) => {
           this.isLoading.set(false);
           console.error('Failed to load users', err);
           
           if (err.name === 'TimeoutError') {
-            this.showNotification('Server is taking longer to wake up. Please refresh.', 'error');
+            this.showNotification('Server is taking longer to respond. Please refresh.', 'error');
           } else {
             this.showNotification('Failed to load user list from server.', 'error');
           }
         },
       });
+  }
+
+  refreshUsers(): void {
+    this.loadUsers(true);
   }
 
   confirmDelete(user: User): void {
@@ -87,8 +92,6 @@ export class Users implements OnInit {
     this.userService
       .deleteUser(user.id)
       .pipe(
-        retry({ count: 2, delay: 2000 }),
-        timeout(30000),
         catchError((err) => {
           this.isLoading.set(false);
           return throwError(() => err);
@@ -97,7 +100,6 @@ export class Users implements OnInit {
       .subscribe({
         next: () => {
           this.isLoading.set(false);
-          this.users.update((current) => current.filter((u) => u.id !== user.id));
           this.showNotification(`User "${user.name}" was successfully deleted.`, 'success');
           this.userToDelete.set(null);
         },
@@ -128,8 +130,6 @@ export class Users implements OnInit {
       this.userService
         .createUser(newUserData)
         .pipe(
-          retry({ count: 3, delay: 3000 }),
-          timeout(60000),
           catchError((err) => {
             this.isLoading.set(false);
             return throwError(() => err);
@@ -138,7 +138,6 @@ export class Users implements OnInit {
         .subscribe({
           next: (createdUser) => {
             this.isLoading.set(false);
-            this.users.update((current) => [...current, createdUser]);
             this.closeModal();
             this.showNotification(`User "${createdUser.name}" created successfully!`, 'success');
           },
@@ -160,8 +159,6 @@ export class Users implements OnInit {
       this.userService
         .updateUser(submittingItem.id, submittingItem)
         .pipe(
-          retry({ count: 2, delay: 2000 }),
-          timeout(30000),
           catchError((err) => {
             this.isLoading.set(false);
             return throwError(() => err);
@@ -170,9 +167,6 @@ export class Users implements OnInit {
         .subscribe({
           next: () => {
             this.isLoading.set(false);
-            this.users.update((current) =>
-              current.map((u) => (u.id === submittingItem.id ? submittingItem : u))
-            );
             this.closeModal();
             this.showNotification(`User "${submittingItem.name}" updated successfully!`, 'success');
           },
