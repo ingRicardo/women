@@ -39,7 +39,6 @@ export class Users implements OnInit {
   }
 
   loadUsers(forceRefresh = false): void {
-    // Avoid triggering loading spinner if data is already available
     if (this.users().length > 0 && !forceRefresh) {
       return;
     }
@@ -63,7 +62,7 @@ export class Users implements OnInit {
           console.error('Failed to load users', err);
           
           if (err.name === 'TimeoutError') {
-            this.showNotification('Server is taking longer to respond. Please refresh.', 'error');
+            this.showNotification('Server response timed out. Click refresh to retry.', 'error');
           } else {
             this.showNotification('Failed to load user list from server.', 'error');
           }
@@ -101,15 +100,34 @@ export class Users implements OnInit {
         next: () => {
           this.isLoading.set(false);
           this.showNotification(`User "${user.name}" was successfully deleted.`, 'success');
+          
           this.userToDelete.set(null);
+          this.loadUsers(true);
+          this.adjustPageAfterDelete();
         },
         error: (err) => {
           this.isLoading.set(false);
           console.error('Failed to delete user', err);
-          this.showNotification(`Could not delete "${user.name}". Please try again.`, 'error');
+
           this.userToDelete.set(null);
+
+          if (err.name === 'TimeoutError') {
+            this.showNotification(`Server timed out while deleting "${user.name}". Local view refreshed.`, 'error');
+            
+            // On timeout, force reload and adjust pagination so the UI removes the row
+            this.loadUsers(true);
+            this.adjustPageAfterDelete();
+          } else {
+            this.showNotification(`Could not delete "${user.name}". Please try again.`, 'error');
+          }
         },
       });
+  }
+
+  private adjustPageAfterDelete(): void {
+    if (this.paginatedUsers().length === 0 && this.currentPage() > 1) {
+      this.currentPage.update((p) => p - 1);
+    }
   }
 
   openAddModal(): void {
@@ -123,7 +141,9 @@ export class Users implements OnInit {
   saveRecord(submittingItem: User): void {
     this.isLoading.set(true);
 
-    if (!submittingItem.id || submittingItem.id === 0) {
+    const isNew = !submittingItem.id || submittingItem.id === 0;
+
+    if (isNew) {
       // CREATE
       const { id, ...newUserData } = submittingItem;
 
@@ -139,16 +159,20 @@ export class Users implements OnInit {
           next: (createdUser) => {
             this.isLoading.set(false);
             this.closeModal();
+            this.loadUsers(true);
             this.showNotification(`User "${createdUser.name}" created successfully!`, 'success');
           },
           error: (err) => {
             this.isLoading.set(false);
             console.error('Failed to create user', err);
-            
-            if (err.status === 409) {
+
+            this.closeModal();
+            this.loadUsers(true);
+
+            if (err.name === 'TimeoutError') {
+              this.showNotification('Server timed out. Table refreshed to check processing status.', 'error');
+            } else if (err.status === 409) {
               this.showNotification('Username or email already exists.', 'error');
-            } else if (err.name === 'TimeoutError') {
-              this.showNotification('Server response timed out. Please check again.', 'error');
             } else {
               this.showNotification('Failed to create user. Please check inputs or connection.', 'error');
             }
@@ -168,12 +192,21 @@ export class Users implements OnInit {
           next: () => {
             this.isLoading.set(false);
             this.closeModal();
+            this.loadUsers(true);
             this.showNotification(`User "${submittingItem.name}" updated successfully!`, 'success');
           },
           error: (err) => {
             this.isLoading.set(false);
             console.error('Failed to update user', err);
-            this.showNotification('Failed to update user. Please try again.', 'error');
+
+            this.closeModal();
+            this.loadUsers(true);
+
+            if (err.name === 'TimeoutError') {
+              this.showNotification('Server timed out. Table refreshed to check processing status.', 'error');
+            } else {
+              this.showNotification('Failed to update user. Please try again.', 'error');
+            }
           },
         });
     }

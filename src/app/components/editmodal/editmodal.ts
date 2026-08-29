@@ -1,7 +1,6 @@
 import { Component, input, output, effect, viewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-
 @Component({
   selector: 'app-editmodal',
   imports: [FormsModule],
@@ -10,8 +9,9 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './editmodal.css',
 })
 export class Editmodal {
-
- record = input.required<any>();
+  record = input.required<any>();
+  isLoading = input<boolean>(false); // Tracks pending API operations
+  
   save = output<any>();
   cancel = output<void>();
 
@@ -29,10 +29,12 @@ export class Editmodal {
   }
 
   onSave() {
+    if (this.isLoading()) return;
     this.save.emit(this.record());
   }
 
   onCancel() {
+    if (this.isLoading()) return; // Prevents closing while saving
     this.cancel.emit();
   }
 }
