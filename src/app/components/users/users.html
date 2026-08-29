@@ -105,10 +105,14 @@
   </div>
 
   @if (selectedRecord()) {
-    <app-editmodal 
-      [record]="selectedRecord()" 
-      (save)="saveRecord($event)" 
-      (cancel)="closeModal()" />
+@if (selectedRecord()) {
+  <app-editmodal
+    [record]="selectedRecord()"
+    [isLoading]="isLoading()"
+    (save)="saveRecord($event)"
+    (cancel)="closeModal()"
+  ></app-editmodal>
+}
   }
 
   <!-- Delete Confirmation Modal -->
