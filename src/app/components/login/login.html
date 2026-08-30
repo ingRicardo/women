@@ -145,7 +145,22 @@
           <span>Authenticating...</span>
         </div>
       }
-
+      @if (successMessage() || successMessage() === '') {
+  <div class="modal-backdrop">
+    <div class="modal-card">
+      <div class="icon-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h3>Success</h3>
+      <p>{{ successMessage() }}</p>
+      <button type="button" class="btn-confirm" (click)="dismissSuccess()">
+        Back to Login
+      </button>
+    </div>
+  </div>
+}
       <div class="button-group">
         <button type="submit" [disabled]="isLoading()">
           @if (isLoading()) {
