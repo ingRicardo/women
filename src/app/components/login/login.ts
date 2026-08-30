@@ -112,10 +112,11 @@ export class Login {
         error: (err) => {
           this.isLoading.set(false);
           console.error('Registration error:', err);
-          this.handleSuccess('User created successfully! (Server took a moment to wake up)');
+        //  this.handleSuccess('User created successfully! (Server took a moment to wake up)');
           if (err.name === 'TimeoutError' || err.message?.includes('Timeout')) {
             // Trigger styled popup modal on timeout
             this.handleSuccess('User created successfully! (Server took a moment to wake up)');
+          
           } else if (err.status === 409 || err.error?.message) {
             this.errorMessage.set(err.error.message || 'Username or email already exists.');
           } else {
@@ -128,6 +129,7 @@ export class Login {
   private handleSuccess(message: string) {
     this.successMessage.set(message);
     this.errorMessage.set('');
+      //alert(message);
     // Clear registration fields
     this.registerModel.set({ user: '', email: '', password: '', role: '', name: '' });
   }
