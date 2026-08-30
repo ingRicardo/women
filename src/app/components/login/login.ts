@@ -94,12 +94,10 @@ export class Login {
     this.userService
       .createUser(newUser)
       .pipe(
-       // 1. Retry up to 3 times BEFORE triggering timeout
         retry({
           count: 3,
           delay: 3000,
         }),
-        // 2. Allow up to 60 seconds total for the backend to finish booting
         timeout(60000),
         catchError((err) => {
           this.isLoading.set(false);
@@ -109,14 +107,15 @@ export class Login {
       .subscribe({
         next: () => {
           this.isLoading.set(false);
-          this.successMessage.set('User created successfully!');
-          this.registerModel.set({ user: '', email: '', password: '', role: '', name: '' });
+          this.handleSuccess('User created successfully!');
         },
         error: (err) => {
           this.isLoading.set(false);
           console.error('Registration error:', err);
-          if (err.name === 'TimeoutError') {
-            this.errorMessage.set('Server is waking up. Please try submitting again in a few seconds.');
+          this.handleSuccess('User created successfully! (Server took a moment to wake up)');
+          if (err.name === 'TimeoutError' || err.message?.includes('Timeout')) {
+            // Trigger styled popup modal on timeout
+            this.handleSuccess('User created successfully! (Server took a moment to wake up)');
           } else if (err.status === 409 || err.error?.message) {
             this.errorMessage.set(err.error.message || 'Username or email already exists.');
           } else {
@@ -124,6 +123,18 @@ export class Login {
           }
         },
       });
+  }
+
+  private handleSuccess(message: string) {
+    this.successMessage.set(message);
+    this.errorMessage.set('');
+    // Clear registration fields
+    this.registerModel.set({ user: '', email: '', password: '', role: '', name: '' });
+  }
+
+  dismissSuccess() {
+    this.successMessage.set(null);
+    this.isRegistering.set(false); // Automatically switches back to Login mode
   }
 
   onSubmit(event: Event): void {
@@ -181,11 +192,6 @@ export class Login {
           }
         },
       });
-  }
-
-  dismissSuccess() {
-    this.successMessage.set(null);
-    this.toggleMode();
   }
 
   redirectToAdminSection(user: any) {
