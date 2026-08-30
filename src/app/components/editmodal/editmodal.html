@@ -2,100 +2,83 @@
   @if (record()) {
   <div class="modal-content">
     <h3>{{ record().id ? 'Edit Record' : 'Add New Record' }}</h3>
-    <table>
-      <tr>
-        <td><label for="name">Name:</label></td>
-        <td>
-          <input
-            id="name"
-            [(ngModel)]="record().name"
-            [disabled]="isLoading()"
-            placeholder="Enter name..."
-            [class.custom-input]="true"
-            [style.font-size.px]="16"
-            type="text"
-            class="search-input"
-          />
-        </td>
-      </tr>
-      <tr>
-        <td><label for="role">Role:</label></td>
-        <td>
-          <input
-            id="role"
-            [(ngModel)]="record().role"
-            [disabled]="isLoading()"
-            placeholder="Enter role..."
-            [class.custom-input]="true"
-            [style.font-size.px]="16"
-            type="text"
-            class="search-input"
-          />
-        </td>
-      </tr>
-      <tr>
-        <td><label for="username">Username:</label></td>
-        <td>
-          <input
-            id="username"
-            [(ngModel)]="record().username"
-            [disabled]="isLoading()"
-            placeholder="Enter username..."
-            [class.custom-input]="true"
-            [style.font-size.px]="16"
-            type="text"
-            class="search-input"
-          />
-        </td>
-      </tr>
-      <tr>
-        <td><label for="password">Password:</label></td>
-        <td>
-          <input
-            id="password"
-            [(ngModel)]="record().password"
-            [disabled]="isLoading()"
-            type="password"
-            placeholder="Enter password..."
-            [class.custom-input]="true"
-            [style.font-size.px]="16"
-            class="search-input"
-          />
-        </td>
-      </tr>
-      <tr>
-        <td><label for="email">Email:</label></td>
-        <td>
-          <input
-            id="email"
-            [(ngModel)]="record().email"
-            [disabled]="isLoading()"
-            type="email"
-            placeholder="Enter email..."
-            [class.custom-input]="true"
-            [style.font-size.px]="16"
-            class="search-input"
-          />
-        </td>
-      </tr>
+    
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          id="name"
+          [(ngModel)]="record().name"
+          [disabled]="isLoading()"
+          placeholder="Enter name..."
+          type="text"
+          class="custom-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role</label>
+        <select
+          id="role"
+          [(ngModel)]="record().role"
+          [disabled]="isLoading()"
+          class="custom-input custom-select"
+        >
+          <option value="" disabled selected>Select role...</option>
+          <option value="ADMIN">ADMIN</option>
+          <option value="USER">USER</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          [(ngModel)]="record().username"
+          [disabled]="isLoading()"
+          placeholder="Enter username..."
+          type="text"
+          class="custom-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          [(ngModel)]="record().password"
+          [disabled]="isLoading()"
+          type="password"
+          placeholder="Enter password..."
+          class="custom-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          [(ngModel)]="record().email"
+          [disabled]="isLoading()"
+          type="email"
+          placeholder="Enter email..."
+          class="custom-input"
+        />
+      </div>
+
       @if (record().id) {
-        <tr>
-          <td><label for="id">ID:</label></td>
-          <td>
-            <input
-              id="id"
-              disabled
-              [(ngModel)]="record().id"
-              type="number"
-              placeholder="Enter ID..."
-              [class.custom-input]="true"
-              [style.font-size.px]="16"
-              class="search-input"
-            />
-          </td>
-        </tr>
+        <div class="form-group">
+          <label for="id">ID</label>
+          <input
+            id="id"
+            disabled
+            [(ngModel)]="record().id"
+            type="number"
+            class="custom-input"
+          />
+        </div>
       }
-    </table>
+    </div>
 
     <div class="actions">
       <button class="cancel-btn" [disabled]="isLoading()" (click)="onCancel()">
