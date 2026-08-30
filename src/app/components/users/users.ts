@@ -88,6 +88,9 @@ export class Users implements OnInit {
 
     this.isLoading.set(true);
 
+    // 1. Trigger local removal if UserService supports direct signal update
+    this.removeUserFromLocalState(user.id);
+
     this.userService
       .deleteUser(user.id)
       .pipe(
@@ -112,16 +115,23 @@ export class Users implements OnInit {
           this.userToDelete.set(null);
 
           if (err.name === 'TimeoutError') {
-            this.showNotification(`Server timed out while deleting "${user.name}". Local view refreshed.`, 'error');
-            
-            // On timeout, force reload and adjust pagination so the UI removes the row
-            this.loadUsers(true);
-            this.adjustPageAfterDelete();
+            this.showNotification(`Server timed out while deleting "${user.name}". Table view updated locally.`, 'error');
           } else {
             this.showNotification(`Could not delete "${user.name}". Please try again.`, 'error');
           }
+
+          // Force fresh load from API and re-calculate page boundaries
+          this.loadUsers(true);
+          this.adjustPageAfterDelete();
         },
       });
+  }
+
+  private removeUserFromLocalState(userId: number): void {
+    // Calls local state update on UserService if implemented
+    if (typeof (this.userService as any).deleteUserLocally === 'function') {
+      (this.userService as any).deleteUserLocally(userId);
+    }
   }
 
   private adjustPageAfterDelete(): void {

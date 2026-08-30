@@ -16,7 +16,7 @@ export interface User {
 })
 export class UserService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://womenapi.onrender.com/api/Users'; // Replace with your backend URL
+  private apiUrl = 'https://womenapi.onrender.com/api/Users';
 
   // Internal writable signal state
   private usersState = signal<User[]>([]);
@@ -81,14 +81,28 @@ export class UserService {
   }
 
   deleteUser(id: number): Observable<void> {
+    // Optimistically update local signal state immediately
+    this.deleteUserLocally(id);
+
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       retry({ count: 2, delay: 2000 }),
       timeout(30000),
       tap(() => {
-        // Remove deleted record immediately from state signal
-        this.usersState.update((current) => current.filter((u) => u.id !== id));
+        // Confirmed server deletion
+      }),
+      catchError((err) => {
+        // If deletion fails on backend (non-timeout), re-fetch to restore state
+        if (err.name !== 'TimeoutError') {
+          this.getUsers(true).subscribe();
+        }else this.getUsers(true).subscribe();
+        return throwError(() => err);
       })
     );
+  }
+
+  // Method called by component for immediate local signal mutation
+  deleteUserLocally(id: number): void {
+    this.usersState.update((current) => current.filter((u) => u.id !== id));
   }
 
   clearCache(): void {
