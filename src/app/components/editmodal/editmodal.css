@@ -1,49 +1,145 @@
-dialog { border: none; border-radius: 8px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
-    .modal-content { display: flex; flex-direction: column; gap: 15px; width: 300px; }
-    .actions { display: flex; justify-content: flex-end; gap: 10px; }
-    .save-btn { background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;}
-    .save-btn:hover { background: #0056b3; }
-    .cancel-btn { background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;}
-    .cancel-btn:hover { background: #5a6268; }
-
-.custom-input {
-  width: 100%;
-  padding: 10px 1px; 
-
-  border: 2px solid #ccc;
-  border-radius: 6px;
-  outline: none;
-  transition: border-color 0.2s ease-in-out;
+dialog {
+  border: none;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* Pseudo-selector styling */
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 340px;
+}
+
+.modal-content h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Flex layout replacing table structure */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Standardized Input and Select Styling */
+.custom-input {
+  width: 100%;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
 .custom-input:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .custom-input::placeholder {
   color: #9ca3af;
 }
-.actions button:disabled,
-input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+
+/* Custom Select Specific Adjustments */
+.custom-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%6b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+/* Actions block */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.cancel-btn,
+.save-btn {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
 }
 
 .save-btn {
+  background-color: #2563eb;
+  color: #ffffff;
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
-/* Simple CSS Spinner */
+.save-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.cancel-btn {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+/* Generic disabled state for non-save inputs/buttons */
+.actions button:disabled,
+.custom-input:disabled {
+  background-color: #f3f4f6;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* HIGH SPECIFICITY OVERRIDE FOR SAVE BUTTON DURING LOADING */
+.actions button.save-btn:disabled,
+button.save-btn:disabled {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  cursor: wait !important;
+}
+
+/* Spinner */
 .spinner {
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #ffffff;
+  border-top-color: #60a5fa; /* Vibrant light blue spinning arc */
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
