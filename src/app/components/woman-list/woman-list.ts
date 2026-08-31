@@ -28,6 +28,9 @@ export class WomanList implements OnInit {
   ratingsMap = signal<Map<number, WomanRatingSummaryDto>>(new Map());
   isLoading = signal<boolean>(false);
 
+  // Guard flag to prevent repeated list fetches
+  private isLoaded = false;
+
   // Form State
   selectedWomanForRating = signal<Woman | null>(null);
   selectedRate = signal<number>(5);
@@ -42,6 +45,11 @@ export class WomanList implements OnInit {
   }
 
   loadWomen(): void {
+    // Ensures the API request triggers strictly once
+    if (this.isLoaded || this.women().length > 0) {
+      return;
+    }
+
     this.isLoading.set(true);
 
     this.womanService
@@ -58,6 +66,7 @@ export class WomanList implements OnInit {
         next: (data) => {
           this.isLoading.set(false);
           this.women.set(data);
+          this.isLoaded = true;
         },
         error: (err) => {
           this.isLoading.set(false);
