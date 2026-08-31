@@ -21,11 +21,27 @@ export class UserService {
   // Internal writable signal state
   private usersState = signal<User[]>([]);
   // Expose as read-only signal for components to consume
-  users = this.usersState.asReadonly();
+//  users = this.usersState.asReadonly();
 
   private isLoaded = false;
   private usersObservable$: Observable<User[]> | null = null;
 
+  // Inside UserService:
+private usersSignal = signal<User[]>([]);
+readonly users = this.usersSignal.asReadonly();
+
+// When adding a user:
+addUserLocally(newUser: User): void {
+  this.usersSignal.update(current => [...current, newUser]);
+}
+
+// When fetching users from API:
+getUsers(forceRefresh = true): Observable<User[]> {
+  return this.http.get<User[]>(this.apiUrl).pipe(
+    tap(data => this.usersSignal.set(data)) // .set with fresh array reference
+  );
+}
+/*
   getUsers(forceRefresh = false): Observable<User[]> {
     // Return cached data immediately if already fetched and no force refresh requested
     if (this.isLoaded && !forceRefresh) {
@@ -54,7 +70,7 @@ export class UserService {
     }
 
     return this.usersObservable$;
-  }
+  } */
 
   createUser(userData: Omit<User, 'id'>): Observable<User> {
     return this.http.post<User>(this.apiUrl, userData).pipe(

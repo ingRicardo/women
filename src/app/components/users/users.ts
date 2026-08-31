@@ -31,7 +31,6 @@ export class Users implements OnInit {
 
   // Feedback Notification State
   notification = signal<NotificationAlert | null>(null);
-
   private notificationTimeout: any;
 
   ngOnInit(): void {
@@ -42,7 +41,6 @@ export class Users implements OnInit {
     if (this.users().length > 0 && !forceRefresh) {
       return;
     }
-
     this.isLoading.set(true);
 
     this.userService
@@ -87,8 +85,6 @@ export class Users implements OnInit {
     if (!user) return;
 
     this.isLoading.set(true);
-
-    // 1. Trigger local removal if UserService supports direct signal update
     this.removeUserFromLocalState(user.id);
 
     this.userService
@@ -111,7 +107,6 @@ export class Users implements OnInit {
         error: (err) => {
           this.isLoading.set(false);
           console.error('Failed to delete user', err);
-
           this.userToDelete.set(null);
 
           if (err.name === 'TimeoutError') {
@@ -120,7 +115,6 @@ export class Users implements OnInit {
             this.showNotification(`Could not delete "${user.name}". Please try again.`, 'error');
           }
 
-          // Force fresh load from API and re-calculate page boundaries
           this.loadUsers(true);
           this.adjustPageAfterDelete();
         },
@@ -128,7 +122,6 @@ export class Users implements OnInit {
   }
 
   private removeUserFromLocalState(userId: number): void {
-    // Calls local state update on UserService if implemented
     if (typeof (this.userService as any).deleteUserLocally === 'function') {
       (this.userService as any).deleteUserLocally(userId);
     }
@@ -150,11 +143,9 @@ export class Users implements OnInit {
 
   saveRecord(submittingItem: User): void {
     this.isLoading.set(true);
-
     const isNew = !submittingItem.id || submittingItem.id === 0;
 
     if (isNew) {
-      // CREATE
       const { id, ...newUserData } = submittingItem;
 
       this.userService
@@ -169,13 +160,23 @@ export class Users implements OnInit {
           next: (createdUser) => {
             this.isLoading.set(false);
             this.closeModal();
-            this.loadUsers(true);
+            
+            // If the service supports direct signal append, use it; otherwise force refresh
+            if (typeof (this.userService as any).addUserLocally === 'function') {
+              (this.userService as any).addUserLocally(createdUser);
+            } else {
+              this.loadUsers(true);
+            }
+
+            // Move to the last page so the newly added record is visible
+            const lastPage = Math.ceil((this.users().length) / this.pageSize()) || 1;
+            this.currentPage.set(lastPage);
+
             this.showNotification(`User "${createdUser.name}" created successfully!`, 'success');
           },
           error: (err) => {
             this.isLoading.set(false);
             console.error('Failed to create user', err);
-
             this.closeModal();
             this.loadUsers(true);
 
@@ -189,7 +190,6 @@ export class Users implements OnInit {
           },
         });
     } else {
-      // UPDATE
       this.userService
         .updateUser(submittingItem.id, submittingItem)
         .pipe(
@@ -208,7 +208,6 @@ export class Users implements OnInit {
           error: (err) => {
             this.isLoading.set(false);
             console.error('Failed to update user', err);
-
             this.closeModal();
             this.loadUsers(true);
 
