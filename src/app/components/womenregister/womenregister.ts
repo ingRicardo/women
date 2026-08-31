@@ -35,7 +35,7 @@ export interface NotificationAlert {
 export class Womenregister implements OnInit {
 
   // Signals synced with template control flow
-  isLoadingWomen = signal<boolean>(true);
+  isLoadingWomen = signal<boolean>(false);
   isLoadingStats = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
   isDeleting = signal<boolean>(false);
@@ -43,7 +43,12 @@ export class Womenregister implements OnInit {
 
   womanForm: FormGroup;
   private womanService = inject(WomanService);
+  
+  // Shared signal or local state container
   women = signal<Woman[]>([]);
+
+  // Flag to ensure initial API fetch runs strictly once per service/component lifecycle
+  private isLoaded = false;
 
   // Notification State
   notification = signal<NotificationAlert | null>(null);
@@ -60,7 +65,12 @@ export class Womenregister implements OnInit {
     this.loadWomen();
   }
 
+  // Ensures data is loaded from the server strictly once
   loadWomen(): void {
+    if (this.isLoaded || this.women().length > 0) {
+      return;
+    }
+
     this.isLoadingWomen.set(true);
     this.isLoadingStats.set(true);
 
@@ -76,8 +86,9 @@ export class Womenregister implements OnInit {
         })
       )
       .subscribe({
-        next: (data) => {
+        next: (data: Woman[]) => {
           this.women.set(data);
+          this.isLoaded = true;
           this.isLoadingWomen.set(false);
           this.isLoadingStats.set(false);
         },
@@ -118,7 +129,7 @@ export class Womenregister implements OnInit {
     const statuses = ['Single', 'Married', 'Divorced', 'Widowed'];
 
     return statuses.map((status) => {
-      const count = list.filter((u) => u.status.toLowerCase() === status.toLowerCase()).length;
+      const count = list.filter((u: Woman) => u.status.toLowerCase() === status.toLowerCase()).length;
       const percentage = Math.round((count / total) * 100);
       return { status, count, percentage };
     });
@@ -132,7 +143,7 @@ export class Womenregister implements OnInit {
     if (total === 0) return [];
 
     const raceMap = new Map<string, number>();
-    list.forEach((u) => {
+    list.forEach((u: Woman) => {
       const r = u.race || 'Other';
       raceMap.set(r, (raceMap.get(r) || 0) + 1);
     });
@@ -168,14 +179,14 @@ export class Womenregister implements OnInit {
     if (!q) return this.women();
 
     return this.women().filter(
-      (u) =>
+      (u: Woman) =>
         u.name.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q) ||
         u.country.toLowerCase().includes(q)
     );
   });
 
-  totalPages = computed(() => Math.ceil(this.filteredWomen().length / this.pageSize()));
+  totalPages = computed(() => Math.ceil(this.filteredWomen().length / this.pageSize()) || 1);
   totalPagesArray = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
   paginatedWomen = computed(() => {
@@ -246,13 +257,12 @@ export class Womenregister implements OnInit {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  // Request deletion confirmation
   promptRemoveWoman(id: number): void {
     this.pendingDeleteId.set(id);
     this.showDeleteModal.set(true);
   }
 
-  // Execute deletion after confirmation
+  // Removes item directly from local signal state without re-fetching
   confirmRemoveWoman(): void {
     const id = this.pendingDeleteId();
     if (id === null) return;
@@ -275,7 +285,9 @@ export class Womenregister implements OnInit {
         next: () => {
           this.isDeleting.set(false);
           this.isDeletingId.set(null);
-          this.women.update((list) => list.filter((woman) => woman.id !== id));
+          
+          // Local state update: Filter out deleted item
+          this.women.update((current) => current.filter((w) => w.id !== id));
 
           if (this.currentPage() > this.totalPages() && this.totalPages() > 0) {
             this.currentPage.set(this.totalPages());
@@ -302,7 +314,6 @@ export class Womenregister implements OnInit {
     this.pendingDeleteId.set(null);
   }
 
-  // Request addition confirmation
   onSubmit(): void {
     if (this.womanForm.valid) {
       const formValue = this.womanForm.getRawValue();
@@ -323,7 +334,7 @@ export class Womenregister implements OnInit {
     }
   }
 
-  // Execute creation after confirmation
+  // Appends newly created record returned from backend directly to local signal state
   confirmAddWoman(): void {
     const newWoman = this.pendingFormData();
     if (!newWoman) return;
@@ -341,9 +352,13 @@ export class Womenregister implements OnInit {
         })
       )
       .subscribe({
-        next: (created) => {
+        next: (createdWoman: Woman) => {
           this.isSubmitting.set(false);
-          this.women.update((current) => [...current, created]);
+          
+          // Local state update: Append created object (or assign fallback ID if API returns void/204)
+          const recordToAdd = createdWoman?.id ? createdWoman : { ...newWoman, id: Date.now() };
+          this.women.update((current) => [...current, recordToAdd]);
+          
           this.womanForm.reset({ status: 'Single' });
           this.showNotification('New record added successfully.', 'success');
           this.cancelAdd();
