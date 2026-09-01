@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WomanRatesService } from '../../services/woman-rates.service';
@@ -23,15 +23,19 @@ export class WomanList implements OnInit {
   private readonly ratesService = inject(WomanRatesService);
   private readonly womanService = inject(WomanService);
 
-  // Signals
-  women = signal<Woman[]>([]);
+  // Directly bind state to service read-only signal
+  women = this.womanService.women;
   ratingsMap = signal<Map<number, WomanRatingSummaryDto>>(new Map());
-  isLoading = signal<boolean>(false);
 
-  // Guard flag to prevent repeated list fetches
-  private isLoaded = false;
+// Granular Loading Signals
+isLoadingList = signal<boolean>(false);
+isLoadingRatings = signal<boolean>(false);
+isSubmittingRating = signal<boolean>(false);
 
-  // Form State
+// Unified Loading Signal for HTML Template
+isLoading = computed(() => this.isLoadingList() || this.isLoadingRatings() || this.isSubmittingRating());
+
+  // Form & Rating Modal Signals
   selectedWomanForRating = signal<Woman | null>(null);
   selectedRate = signal<number>(5);
 
@@ -39,40 +43,51 @@ export class WomanList implements OnInit {
   notification = signal<NotificationAlert | null>(null);
   private notificationTimeout: any;
 
+  // Table & Filter Signals
+  searchQuery = signal<string>('');
+  currentPage = signal<number>(1);
+  pageSize = signal<number>(6);
+
+  constructor() {
+    // Automatically trigger list fetch when the store is empty or changes are emitted
+    effect(() => {
+      const currentList = this.women();
+      if (currentList.length === 0) {
+        this.loadWomen();
+      }
+    });
+  }
+
   ngOnInit(): void {
-    this.loadWomen();
     this.loadRatings();
   }
 
-  loadWomen(): void {
-    // Ensures the API request triggers strictly once
-    if (this.isLoaded || this.women().length > 0) {
+  loadWomen(forceRefresh = false): void {
+    if (this.women().length > 0 && !forceRefresh) {
       return;
     }
 
-    this.isLoading.set(true);
+    this.isLoadingList.set(true);
 
     this.womanService
-      .getWomen()
+      .getWomen(forceRefresh)
       .pipe(
         retry({ count: 3, delay: 3000 }),
         timeout(60000),
         catchError((err) => {
-          this.isLoading.set(false);
+          this.isLoadingList.set(false);
           return throwError(() => err);
         })
       )
       .subscribe({
-        next: (data) => {
-          this.isLoading.set(false);
-          this.women.set(data);
-          this.isLoaded = true;
+        next: () => {
+          this.isLoadingList.set(false);
         },
         error: (err) => {
-          this.isLoading.set(false);
+          this.isLoadingList.set(false);
           console.error('Failed to load women list:', err);
           if (err.name === 'TimeoutError') {
-            this.showNotification('Server is taking longer to wake up. Please try refreshing.', 'error');
+            this.showNotification('Server response timed out. Click refresh to retry.', 'error');
           } else {
             this.showNotification('Failed to load profile list from server.', 'error');
           }
@@ -80,23 +95,85 @@ export class WomanList implements OnInit {
       });
   }
 
+  refreshWomen(): void {
+    this.loadWomen(true);
+  }
+
   loadRatings(): void {
+    this.isLoadingRatings.set(true);
+
     this.ratesService
       .getAllAverageRates()
       .pipe(
         retry({ count: 3, delay: 3000 }),
         timeout(60000),
-        catchError((err) => throwError(() => err))
+        catchError((err) => {
+          this.isLoadingRatings.set(false);
+          return throwError(() => err);
+        })
       )
       .subscribe({
         next: (summaries) => {
+          this.isLoadingRatings.set(false);
           const map = new Map<number, WomanRatingSummaryDto>();
           summaries.forEach((s) => map.set(s.womanId, s));
           this.ratingsMap.set(map);
         },
-        error: (err) => console.error('Failed to load ratings summary:', err),
+        error: (err) => {
+          this.isLoadingRatings.set(false);
+          console.error('Failed to load ratings summary:', err);
+        },
       });
   }
+
+  // --- Filtering & Pagination Computations ---
+
+  filteredWomen = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.women();
+
+    return this.women().filter(
+      (u: Woman) =>
+        u.name.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q) ||
+        u.country.toLowerCase().includes(q)
+    );
+  });
+
+  totalPages = computed(() => Math.ceil(this.filteredWomen().length / this.pageSize()) || 1);
+  totalPagesArray = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
+
+  paginatedWomen = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    return this.filteredWomen().slice(start, start + this.pageSize());
+  });
+
+  startIndex = computed(() =>
+    this.filteredWomen().length === 0 ? 0 : (this.currentPage() - 1) * this.pageSize() + 1
+  );
+  endIndex = computed(() =>
+    Math.min(this.currentPage() * this.pageSize(), this.filteredWomen().length)
+  );
+
+  onSearch(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchQuery.set(value);
+    this.currentPage.set(1);
+  }
+
+  onPageSizeChange(event: Event): void {
+    const size = Number((event.target as HTMLSelectElement).value);
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  // --- Modal & Rating Handlers ---
 
   openRateModal(woman: Woman): void {
     this.selectedWomanForRating.set(woman);
@@ -111,7 +188,7 @@ export class WomanList implements OnInit {
     const woman = this.selectedWomanForRating();
     if (!woman) return;
 
-    this.isLoading.set(true);
+    this.isSubmittingRating.set(true);
 
     const dto = {
       womanId: woman.id,
@@ -124,13 +201,12 @@ export class WomanList implements OnInit {
         retry({ count: 2, delay: 2000 }),
         timeout(30000),
         catchError((err) => {
-          this.isLoading.set(false);
+          this.isSubmittingRating.set(false);
           return throwError(() => err);
         })
       )
       .subscribe({
         next: () => {
-          // Fetch updated summary for the specific profile
           this.ratesService
             .getAverageRateForWoman(woman.id)
             .pipe(
@@ -140,7 +216,7 @@ export class WomanList implements OnInit {
             )
             .subscribe({
               next: (updatedSummary) => {
-                this.isLoading.set(false);
+                this.isSubmittingRating.set(false);
                 this.ratingsMap.update((map) => {
                   const newMap = new Map(map);
                   newMap.set(woman.id, updatedSummary);
@@ -149,7 +225,7 @@ export class WomanList implements OnInit {
                 this.showNotification('Rating submitted successfully!', 'success');
               },
               error: (err) => {
-                this.isLoading.set(false);
+                this.isSubmittingRating.set(false);
                 console.error('Error fetching updated rating:', err);
               },
             });
@@ -157,7 +233,7 @@ export class WomanList implements OnInit {
           this.closeRateModal();
         },
         error: (err) => {
-          this.isLoading.set(false);
+          this.isSubmittingRating.set(false);
           console.error('Error adding rating:', err);
           if (err.name === 'TimeoutError') {
             this.showNotification('Request timed out while submitting rating.', 'error');
@@ -167,6 +243,8 @@ export class WomanList implements OnInit {
         },
       });
   }
+
+  // --- Notifications ---
 
   showNotification(message: string, type: 'success' | 'error'): void {
     if (this.notificationTimeout) {

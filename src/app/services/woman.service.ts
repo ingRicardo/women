@@ -17,8 +17,8 @@ export class WomanService {
   //readonly women = this.womenState.asReadonly();
 
   // Internal caching flags & streams
-  private isLoaded = false;
-  private womenObservable$: Observable<Woman[]> | null = null;
+ // private isLoaded = false;
+ // private womenObservable$: Observable<Woman[]> | null = null;
 
   private womenSignal = signal<Woman[]>([]);
   readonly women = this.womenSignal.asReadonly();
@@ -32,28 +32,6 @@ export class WomanService {
   );
 }
 
-  // --- GET Operations with Caching & Resilience ---
-/*
-  getWomen(forceRefresh = false): Observable<Woman[]> {
-    if (forceRefresh || !this.isLoaded || !this.womenObservable$) {
-      this.womenObservable$ = this.http.get<Woman[]>(this.apiUrl).pipe(
-        retry({ count: 3, delay: 3000 }),
-        timeout(60000),
-        tap((data) => {
-          this.womenSignal.set(data);
-          this.isLoaded = true;
-        }),
-        shareReplay(1),
-        catchError((err) => {
-          this.isLoaded = false;
-          this.womenObservable$ = null;
-          return throwError(() => err);
-        })
-      );
-    }
-    return this.womenObservable$;
-  }
-*/
   getWomanById(id: number): Observable<Woman> {
     return this.http.get<Woman>(`${this.apiUrl}/${id}`).pipe(
       retry({ count: 2, delay: 2000 }),
@@ -109,12 +87,12 @@ export class WomanService {
   deleteWomanLocally(id: number): void {
     this.womenSignal.update((current) => current.filter((w) => w.id !== id));
   }
-
+/*
   clearCache(): void {
     this.womenSignal.set([]);
     this.isLoaded = false;
     this.womenObservable$ = null;
-  }
+  }*/
 
   // --- Rating Operations ---
 
