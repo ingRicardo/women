@@ -41,36 +41,7 @@ getUsers(forceRefresh = true): Observable<User[]> {
     tap(data => this.usersSignal.set(data)) // .set with fresh array reference
   );
 }
-/*
-  getUsers(forceRefresh = false): Observable<User[]> {
-    // Return cached data immediately if already fetched and no force refresh requested
-    if (this.isLoaded && !forceRefresh) {
-      return new Observable((subscriber) => {
-        subscriber.next(this.usersState());
-        subscriber.complete();
-      });
-    }
-
-    // Reuse in-flight HTTP request to prevent duplicate network calls
-    if (!this.usersObservable$ || forceRefresh) {
-      this.usersObservable$ = this.http.get<User[]>(this.apiUrl).pipe(
-        retry({ count: 3, delay: 3000 }),
-        timeout(60000),
-        tap((data) => {
-          this.usersState.set(data);
-          this.isLoaded = true;
-          this.usersObservable$ = null;
-        }),
-        shareReplay(1),
-        catchError((err) => {
-          this.usersObservable$ = null;
-          return throwError(() => err);
-        })
-      );
-    }
-
-    return this.usersObservable$;
-  } */
+ 
 
   createUser(userData: Omit<User, 'id'>): Observable<User> {
     return this.http.post<User>(this.apiUrl, userData).pipe(
