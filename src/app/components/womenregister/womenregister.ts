@@ -3,7 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { WomanService } from '../../services/woman.service';
 import { Woman } from '../models/woman.model';
-import { retry, timeout, catchError, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 
 export interface StatusStat {
   status: string;
@@ -33,8 +33,13 @@ export interface NotificationAlert {
   styleUrl: './womenregister.css',
 })
 export class Womenregister implements OnInit {
+  private womanService = inject(WomanService);
+  private fb = inject(FormBuilder);
 
-  // Signals synced with template control flow
+  // Directly bind component state to service read-only signal
+  women = this.womanService.women;
+
+  // Granular Loading Signals (Matched to Template bindings)
   isLoadingWomen = signal<boolean>(false);
   isLoadingStats = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
@@ -42,68 +47,23 @@ export class Womenregister implements OnInit {
   isDeletingId = signal<number | null>(null);
 
   womanForm: FormGroup;
-  private womanService = inject(WomanService);
-  
-  // Shared signal or local state container
-  women = signal<Woman[]>([]);
-
-  // Flag to ensure initial API fetch runs strictly once per service/component lifecycle
-  private isLoaded = false;
+  womenData = output<Woman[]>();
 
   // Notification State
   notification = signal<NotificationAlert | null>(null);
   private notificationTimeout: any;
 
-  // Confirmation Modal Signals
+  // Modal State Signals
   showDeleteModal = signal<boolean>(false);
   pendingDeleteId = signal<number | null>(null);
 
   showAddModal = signal<boolean>(false);
   pendingFormData = signal<Omit<Woman, 'id'> | null>(null);
 
-  ngOnInit(): void {
-    this.loadWomen();
-  }
-
-  // Ensures data is loaded from the server strictly once
-  loadWomen(): void {
-    if (this.isLoaded || this.women().length > 0) {
-      return;
-    }
-
-    this.isLoadingWomen.set(true);
-    this.isLoadingStats.set(true);
-
-    this.womanService
-      .getWomen()
-      .pipe(
-        retry({ count: 3, delay: 3000 }),
-        timeout(60000),
-        catchError((err) => {
-          this.isLoadingWomen.set(false);
-          this.isLoadingStats.set(false);
-          return throwError(() => err);
-        })
-      )
-      .subscribe({
-        next: (data: Woman[]) => {
-          this.women.set(data);
-          this.isLoaded = true;
-          this.isLoadingWomen.set(false);
-          this.isLoadingStats.set(false);
-        },
-        error: (err) => {
-          this.isLoadingWomen.set(false);
-          this.isLoadingStats.set(false);
-          console.error('Error fetching women records:', err);
-          if (err.name === 'TimeoutError') {
-            this.showNotification('Server response timed out. Please try refreshing.', 'error');
-          } else {
-            this.showNotification('Failed to load records from the server.', 'error');
-          }
-        },
-      });
-  }
+  // Table & Filter Signals
+  searchQuery = signal<string>('');
+  currentPage = signal<number>(1);
+  pageSize = signal<number>(5);
 
   raceOptions: string[] = [
     'American Indian or Alaska Native',
@@ -117,9 +77,65 @@ export class Womenregister implements OnInit {
     'Prefer not to say',
   ];
 
-  searchQuery = signal<string>('');
-  currentPage = signal<number>(1);
-  pageSize = signal<number>(5);
+  private palette = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'];
+
+  constructor() {
+    this.womanForm = this.fb.group({
+      avatar: ['', [Validators.required]],
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      dateofbirth: ['', Validators.required],
+      age: [{ value: '', disabled: false }],
+      status: ['Single', Validators.required],
+      country: ['', Validators.required],
+      race: [''],
+    });
+
+    effect(() => {
+      this.womenData.emit(this.women());
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadWomen();
+  }
+
+  loadWomen(forceRefresh = false): void {
+    if (this.women().length > 0 && !forceRefresh) {
+      return;
+    }
+
+    this.isLoadingWomen.set(true);
+
+    this.womanService
+      .getWomen(forceRefresh)
+      .pipe(
+        catchError((err) => {
+          this.isLoadingWomen.set(false);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.isLoadingWomen.set(false);
+        },
+        error: (err) => {
+          this.isLoadingWomen.set(false);
+          console.error('Error fetching women records:', err);
+          if (err.name === 'TimeoutError') {
+            this.showNotification('Server response timed out. Click refresh to retry.', 'error');
+          } else {
+            this.showNotification('Failed to load records from the server.', 'error');
+          }
+        },
+      });
+  }
+
+  refreshWomen(): void {
+    this.loadWomen(true);
+  }
+
+  // --- Statistics Computations ---
 
   statusStats = computed<StatusStat[]>(() => {
     const list = this.women();
@@ -134,8 +150,6 @@ export class Womenregister implements OnInit {
       return { status, count, percentage };
     });
   });
-
-  private palette = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'];
 
   raceStats = computed<StatItem[]>(() => {
     const list = this.women();
@@ -173,6 +187,8 @@ export class Womenregister implements OnInit {
 
     return items;
   });
+
+  // --- Filtering & Pagination ---
 
   filteredWomen = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
@@ -219,24 +235,7 @@ export class Womenregister implements OnInit {
     }
   }
 
-  womenData = output<Woman[]>();
-
-  constructor(private fb: FormBuilder) {
-    this.womanForm = this.fb.group({
-      avatar: ['', [Validators.required]],
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      dateofbirth: ['', Validators.required],
-      age: [{ value: '', disabled: false }],
-      status: ['Single', Validators.required],
-      country: ['', Validators.required],
-      race: [''],
-    });
-
-    effect(() => {
-      this.womenData.emit(this.women());
-    });
-  }
+  // --- Form & Action Handlers ---
 
   onDobChange(): void {
     const dobValue = this.womanForm.get('dateofbirth')?.value;
@@ -257,24 +256,24 @@ export class Womenregister implements OnInit {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
+  // --- Deletion Workflow ---
+
   promptRemoveWoman(id: number): void {
     this.pendingDeleteId.set(id);
     this.showDeleteModal.set(true);
   }
 
-  // Removes item directly from local signal state without re-fetching
   confirmRemoveWoman(): void {
     const id = this.pendingDeleteId();
     if (id === null) return;
 
     this.isDeleting.set(true);
     this.isDeletingId.set(id);
+    this.removeWomanFromLocalState(id);
 
     this.womanService
       .deleteWoman(id)
       .pipe(
-        retry({ count: 2, delay: 2000 }),
-        timeout(30000),
         catchError((err) => {
           this.isDeleting.set(false);
           this.isDeletingId.set(null);
@@ -285,26 +284,26 @@ export class Womenregister implements OnInit {
         next: () => {
           this.isDeleting.set(false);
           this.isDeletingId.set(null);
-          
-          // Local state update: Filter out deleted item
-          this.women.update((current) => current.filter((w) => w.id !== id));
-
-          if (this.currentPage() > this.totalPages() && this.totalPages() > 0) {
-            this.currentPage.set(this.totalPages());
-          }
           this.showNotification('Record deleted successfully.', 'success');
           this.cancelDelete();
+          
+          this.loadWomen(true);
+          this.adjustPageAfterDelete();
         },
         error: (err) => {
           this.isDeleting.set(false);
           this.isDeletingId.set(null);
           console.error(`Failed to delete record with ID ${id}:`, err);
-          if (err.name === 'TimeoutError') {
-            this.showNotification('Delete request timed out.', 'error');
-          } else {
-            this.showNotification('Failed to delete record.', 'error');
-          }
           this.cancelDelete();
+
+          if (err.name === 'TimeoutError') {
+            this.showNotification('Server timed out. Table view updated locally.', 'error');
+          } else {
+            this.showNotification('Failed to delete record. Please try again.', 'error');
+          }
+
+          this.loadWomen(true);
+          this.adjustPageAfterDelete();
         },
       });
   }
@@ -312,7 +311,22 @@ export class Womenregister implements OnInit {
   cancelDelete(): void {
     this.showDeleteModal.set(false);
     this.pendingDeleteId.set(null);
+    this.isDeletingId.set(null);
   }
+
+  private removeWomanFromLocalState(id: number): void {
+    if (typeof (this.womanService as any).deleteWomanLocally === 'function') {
+      (this.womanService as any).deleteWomanLocally(id);
+    }
+  }
+
+  private adjustPageAfterDelete(): void {
+    if (this.paginatedWomen().length === 0 && this.currentPage() > 1) {
+      this.currentPage.update((p) => p - 1);
+    }
+  }
+
+  // --- Creation Workflow ---
 
   onSubmit(): void {
     if (this.womanForm.valid) {
@@ -334,7 +348,6 @@ export class Womenregister implements OnInit {
     }
   }
 
-  // Appends newly created record returned from backend directly to local signal state
   confirmAddWoman(): void {
     const newWoman = this.pendingFormData();
     if (!newWoman) return;
@@ -344,8 +357,6 @@ export class Womenregister implements OnInit {
     this.womanService
       .createWoman(newWoman)
       .pipe(
-        retry({ count: 2, delay: 2000 }),
-        timeout(30000),
         catchError((err) => {
           this.isSubmitting.set(false);
           return throwError(() => err);
@@ -354,24 +365,33 @@ export class Womenregister implements OnInit {
       .subscribe({
         next: (createdWoman: Woman) => {
           this.isSubmitting.set(false);
-          
-          // Local state update: Append created object (or assign fallback ID if API returns void/204)
-          const recordToAdd = createdWoman?.id ? createdWoman : { ...newWoman, id: Date.now() };
-          this.women.update((current) => [...current, recordToAdd]);
-          
-          this.womanForm.reset({ status: 'Single' });
-          this.showNotification('New record added successfully.', 'success');
           this.cancelAdd();
+          this.womanForm.reset({ status: 'Single' });
+
+          if (typeof (this.womanService as any).addWomanLocally === 'function') {
+            const recordToAdd = createdWoman?.id ? createdWoman : { ...newWoman, id: Date.now() };
+            (this.womanService as any).addWomanLocally(recordToAdd);
+          }
+
+          this.loadWomen(true);
+
+          const lastPage = Math.ceil(this.women().length / this.pageSize()) || 1;
+          this.currentPage.set(lastPage);
+
+          this.showNotification('New record added successfully.', 'success');
         },
         error: (err) => {
           this.isSubmitting.set(false);
           console.error('Failed to create record:', err);
-          if (err.name === 'TimeoutError') {
-            this.showNotification('Create request timed out.', 'error');
-          } else {
-            this.showNotification('Failed to create record.', 'error');
-          }
           this.cancelAdd();
+          
+          this.loadWomen(true);
+
+          if (err.name === 'TimeoutError') {
+            this.showNotification('Server timed out. Table refreshed to check processing status.', 'error');
+          } else {
+            this.showNotification('Failed to create record. Please check inputs or connection.', 'error');
+          }
         },
       });
   }
@@ -380,6 +400,8 @@ export class Womenregister implements OnInit {
     this.showAddModal.set(false);
     this.pendingFormData.set(null);
   }
+
+  // --- Notifications ---
 
   showNotification(message: string, type: 'success' | 'error'): void {
     if (this.notificationTimeout) {

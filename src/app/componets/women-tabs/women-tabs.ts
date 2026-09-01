@@ -26,7 +26,7 @@ export class WomenTabs {
 
   // Create a computed signal filtered by race
   blackWomen = computed(() => 
-    this.women().filter(woman => woman.race === 'Black' || woman.race === 'African American')
+    this.women().filter(woman => woman.race === 'Black' || woman.race === 'African American' || woman.race === 'Black and African American')
   );
   asianWomen = computed(() => 
     this.women().filter(woman => woman.race === 'Asian' )
