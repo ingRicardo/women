@@ -39,7 +39,7 @@ export class Womenregister implements OnInit {
   // Directly bind component state to service read-only signal
   women = this.womanService.women;
 
-  // Granular Loading Signals (Matched to Template bindings)
+  // Granular Loading Signals
   isLoadingWomen = signal<boolean>(false);
   isLoadingStats = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
@@ -53,12 +53,9 @@ export class Womenregister implements OnInit {
   notification = signal<NotificationAlert | null>(null);
   private notificationTimeout: any;
 
-  // Modal State Signals
+  // Modal State Signals (Delete only)
   showDeleteModal = signal<boolean>(false);
   pendingDeleteId = signal<number | null>(null);
-
-  showAddModal = signal<boolean>(false);
-  pendingFormData = signal<Omit<Woman, 'id'> | null>(null);
 
   // Table & Filter Signals
   searchQuery = signal<string>('');
@@ -256,6 +253,63 @@ export class Womenregister implements OnInit {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
+  // --- Direct Creation Workflow ---
+
+onSubmit(): void {
+  if (this.womanForm.invalid || this.isSubmitting()) {
+    this.womanForm.markAllAsTouched();
+    return;
+  }
+
+  const formValue = this.womanForm.getRawValue();
+
+  const newWoman: Omit<Woman, 'id'> = {
+    name: formValue.name,
+    avatar: formValue.avatar,
+    email: formValue.email,
+    dateOfBirth: formValue.dateofbirth,
+    age: Number(formValue.age) || 0,
+    status: formValue.status,
+    country: formValue.country,
+    race: formValue.race,
+  };
+
+  this.isSubmitting.set(true);
+
+  this.womanService
+    .createWoman(newWoman)
+    .pipe(
+      catchError((err) => {
+        this.isSubmitting.set(false);
+        return throwError(() => err);
+      })
+    )
+    .subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.womanForm.reset({ status: 'Single' });
+
+        // Single source of truth: re-fetch from API
+        this.loadWomen(true);
+
+        const lastPage = Math.ceil(this.women().length / this.pageSize()) || 1;
+        this.currentPage.set(lastPage);
+
+        this.showNotification('New record added successfully.', 'success');
+      },
+      error: (err) => {
+        this.isSubmitting.set(false);
+        console.error('Failed to create record:', err);
+        this.loadWomen(true);
+
+        if (err.name === 'TimeoutError') {
+          this.showNotification('Server timed out. Table refreshed to check processing status.', 'error');
+        } else {
+          this.showNotification('Failed to create record. Please check inputs or connection.', 'error');
+        }
+      },
+    });
+}
   // --- Deletion Workflow ---
 
   promptRemoveWoman(id: number): void {
@@ -324,81 +378,6 @@ export class Womenregister implements OnInit {
     if (this.paginatedWomen().length === 0 && this.currentPage() > 1) {
       this.currentPage.update((p) => p - 1);
     }
-  }
-
-  // --- Creation Workflow ---
-
-  onSubmit(): void {
-    if (this.womanForm.valid) {
-      const formValue = this.womanForm.getRawValue();
-
-      const newWoman: Omit<Woman, 'id'> = {
-        name: formValue.name,
-        avatar: formValue.avatar,
-        email: formValue.email,
-        dateOfBirth: formValue.dateofbirth,
-        age: Number(formValue.age) || 0,
-        status: formValue.status,
-        country: formValue.country,
-        race: formValue.race,
-      };
-
-      this.pendingFormData.set(newWoman);
-      this.showAddModal.set(true);
-    }
-  }
-
-  confirmAddWoman(): void {
-    const newWoman = this.pendingFormData();
-    if (!newWoman) return;
-
-    this.isSubmitting.set(true);
-
-    this.womanService
-      .createWoman(newWoman)
-      .pipe(
-        catchError((err) => {
-          this.isSubmitting.set(false);
-          return throwError(() => err);
-        })
-      )
-      .subscribe({
-        next: (createdWoman: Woman) => {
-          this.isSubmitting.set(false);
-          this.cancelAdd();
-          this.womanForm.reset({ status: 'Single' });
-
-          if (typeof (this.womanService as any).addWomanLocally === 'function') {
-            const recordToAdd = createdWoman?.id ? createdWoman : { ...newWoman, id: Date.now() };
-            (this.womanService as any).addWomanLocally(recordToAdd);
-          }
-
-          this.loadWomen(true);
-
-          const lastPage = Math.ceil(this.women().length / this.pageSize()) || 1;
-          this.currentPage.set(lastPage);
-
-          this.showNotification('New record added successfully.', 'success');
-        },
-        error: (err) => {
-          this.isSubmitting.set(false);
-          console.error('Failed to create record:', err);
-          this.cancelAdd();
-          
-          this.loadWomen(true);
-
-          if (err.name === 'TimeoutError') {
-            this.showNotification('Server timed out. Table refreshed to check processing status.', 'error');
-          } else {
-            this.showNotification('Failed to create record. Please check inputs or connection.', 'error');
-          }
-        },
-      });
-  }
-
-  cancelAdd(): void {
-    this.showAddModal.set(false);
-    this.pendingFormData.set(null);
   }
 
   // --- Notifications ---
