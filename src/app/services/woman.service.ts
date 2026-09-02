@@ -40,7 +40,7 @@ export class WomanService {
   }
 
   // --- CRUD Operations with State Mutation ---
-
+/*
   createWoman(womanData: Omit<Woman, 'id'>): Observable<Woman> {
     return this.http.post<Woman>(this.apiUrl, womanData).pipe(
       retry({ count: 3, delay: 3000 }),
@@ -49,8 +49,14 @@ export class WomanService {
         this.addWomanLocally(newWoman);
       })
     );
-  }
-
+  }*/
+  createWoman(womanData: Omit<Woman, 'id'>): Observable<Woman> {
+  return this.http.post<Woman>(this.apiUrl, womanData).pipe(
+    retry({ count: 3, delay: 3000 }),
+    timeout(60000)
+    // Removed tap(...) to prevent duplicate local state updates
+  );
+}
   updateWoman(id: number, womanData: Woman): Observable<Woman> {
     return this.http.put<Woman>(`${this.apiUrl}/${id}`, womanData).pipe(
       retry({ count: 2, delay: 2000 }),

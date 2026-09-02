@@ -379,34 +379,4 @@
       </div>
     </div>
   }
-
-  <!-- Add Confirmation Modal -->
-  @if (showAddModal()) {
-    <div class="modal-backdrop" (click)="!isSubmitting() && cancelAdd()">
-      <div class="modal-card info-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <div class="modal-icon info-icon">👤</div>
-          <h3>Confirm Registration</h3>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to add <strong>{{ pendingFormData()?.name }}</strong> to the roster?</p>
-          <div class="summary-details">
-            <div><strong>Email:</strong> {{ pendingFormData()?.email }}</div>
-            <div><strong>Country:</strong> {{ pendingFormData()?.country }}</div>
-            <div><strong>Status:</strong> {{ pendingFormData()?.status }}</div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn-cancel" [disabled]="isSubmitting()" (click)="cancelAdd()">Cancel</button>
-          <button type="button" class="btn-confirm-add" [disabled]="isSubmitting()" (click)="confirmAddWoman()">
-            @if (isSubmitting()) {
-              <span class="btn-spinner"></span> Registering...
-            } @else {
-              Confirm & Register
-            }
-          </button>
-        </div>
-      </div>
-    </div>
-  }
 </div>
