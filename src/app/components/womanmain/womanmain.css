@@ -1,44 +1,77 @@
-
-
 .toptitle {
   text-align: center;
 }
-.spinner{
+
+.spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);
   width: 36px;
   height: 36px;
   border-radius: 50%;
   border-left-color: #09f;
   animation: spin 1s linear infinite;
-  
+
 }
 
-/* Add this keyframe definition */
-@keyframes spin {
+ @keyframes spin {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
 
 .empty-table-message {
-    text-align: center;
-    vertical-align: middle;
-    height: 25px; /* Optional: adds height to make vertical centering visible */
-    color: #666;    /* Optional: styles the text color */
-  }
-  .empty-table-messagev2 {
-    text-align: center;
-    vertical-align: middle;
-    height: 25px; /* Optional: adds height to make vertical centering visible */
-    color: #ede2e2;    /* Optional: styles the text color */
-  }
+  text-align: center;
+  vertical-align: middle;
+  height: 25px;
+  color: #666;
+}
+
+.empty-table-messagev2 {
+  text-align: center;
+  vertical-align: middle;
+  height: 25px;
+  color: #ede2e2;
+}
 
 .table-spinner-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100px; /* Gives the spinner room to breathe vertically */
+  height: 100px;
+  /* Gives the spinner room to breathe vertically */
+}
+
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  font-family: Arial, sans-serif;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f4f4f4;
+  color: #333;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: #0a0909;
 }
