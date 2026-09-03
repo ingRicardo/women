@@ -1,5 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, shareReplay, retry, timeout, catchError, throwError } from 'rxjs';
 import { Woman, WomanRatingSummary, CreateRateDto } from '../components/models/woman.model';
 
@@ -7,22 +8,30 @@ import { Woman, WomanRatingSummary, CreateRateDto } from '../components/models/w
   providedIn: 'root',
 })
 export class WomanService {
+
   private http = inject(HttpClient);
 
   private apiUrl = 'https://womenapi.onrender.com/api/Women';
   private rateApiUrl = 'https://womenapi.onrender.com/api/WomanRates';
 
-  // State Management via Signals
-  //private womenState = signal<Woman[]>([]);
-  //readonly women = this.womenState.asReadonly();
-
-  // Internal caching flags & streams
- // private isLoaded = false;
- // private womenObservable$: Observable<Woman[]> | null = null;
-
   private womenSignal = signal<Woman[]>([]);
   readonly women = this.womenSignal.asReadonly();
+
   
+  getWomenv1(): Observable<Woman[]> {
+    console.log('Fetching women data from API...');
+    return this.http.get<Woman[]>(this.apiUrl,{
+    headers: new HttpHeaders({
+       'ng-skip-http-transfer-cache': 'true'
+    })
+  }).pipe(
+      tap({
+      next: (data) => console.log('Raw data received by service:', data),
+      error: (err) => console.error('Service error:', err)
+    })
+    );
+   }
+
   getWomen(forceRefresh = false): Observable<Woman[]> {
   return this.http.get<Woman[]>(this.apiUrl).pipe(
     tap((data) => {
@@ -32,6 +41,7 @@ export class WomanService {
   );
 }
 
+
   getWomanById(id: number): Observable<Woman> {
     return this.http.get<Woman>(`${this.apiUrl}/${id}`).pipe(
       retry({ count: 2, delay: 2000 }),
@@ -39,22 +49,12 @@ export class WomanService {
     );
   }
 
-  // --- CRUD Operations with State Mutation ---
-/*
-  createWoman(womanData: Omit<Woman, 'id'>): Observable<Woman> {
-    return this.http.post<Woman>(this.apiUrl, womanData).pipe(
-      retry({ count: 3, delay: 3000 }),
-      timeout(60000),
-      tap((newWoman) => {
-        this.addWomanLocally(newWoman);
-      })
-    );
-  }*/
+ 
   createWoman(womanData: Omit<Woman, 'id'>): Observable<Woman> {
   return this.http.post<Woman>(this.apiUrl, womanData).pipe(
     retry({ count: 3, delay: 3000 }),
     timeout(60000)
-    // Removed tap(...) to prevent duplicate local state updates
+     
   );
 }
   updateWoman(id: number, womanData: Woman): Observable<Woman> {
@@ -93,13 +93,7 @@ export class WomanService {
   deleteWomanLocally(id: number): void {
     this.womenSignal.update((current) => current.filter((w) => w.id !== id));
   }
-/*
-  clearCache(): void {
-    this.womenSignal.set([]);
-    this.isLoaded = false;
-    this.womenObservable$ = null;
-  }*/
-
+ 
   // --- Rating Operations ---
 
   addRating(dto: CreateRateDto): Observable<void> {
