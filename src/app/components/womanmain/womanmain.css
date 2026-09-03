@@ -10,8 +10,8 @@
   border-radius: 50%;
   border-left-color: #09f;
   animation: spin 1s linear infinite;
+  
 }
-
 
 /* Add this keyframe definition */
 @keyframes spin {
@@ -21,4 +21,24 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+.empty-table-message {
+    text-align: center;
+    vertical-align: middle;
+    height: 25px; /* Optional: adds height to make vertical centering visible */
+    color: #666;    /* Optional: styles the text color */
+  }
+  .empty-table-messagev2 {
+    text-align: center;
+    vertical-align: middle;
+    height: 25px; /* Optional: adds height to make vertical centering visible */
+    color: #ede2e2;    /* Optional: styles the text color */
+  }
+
+.table-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px; /* Gives the spinner room to breathe vertically */
 }
