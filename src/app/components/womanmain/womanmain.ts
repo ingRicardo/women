@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
 import {WomanService} from '../../services/woman.service';
 import { Woman } from '../models/woman.model';
 import {NgOptimizedImage} from '@angular/common';
@@ -28,5 +28,27 @@ export class Womanmain implements OnInit{
     });
     console.log('Women data fetched:', this.women());
   }
- 
+
+  currentPage = signal(1);
+  pageSize = signal(5);
+
+   paginatedItems = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    const end = start + this.pageSize();
+    return this.women().slice(start, end);
+  });
+
+   totalPages = computed(() => Math.ceil(this.women().length / this.pageSize()));
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update(p => p + 1);
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.update(p => p - 1);
+    }
+  }
 }
