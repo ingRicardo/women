@@ -49,6 +49,17 @@ export class WomanService {
     );
   }
 
+  createWomanv1(womanData: Omit<Woman, 'id'>): Observable<Woman> {
+    return this.http.post<Woman>(this.apiUrl, womanData).pipe(
+      tap({ 
+      next: (data) => {
+        console.log('Woman created successfully:', data);
+        this.addWomanLocally(data); // Update the signal state
+      },
+      error: (err) => console.error('Error creating woman:', err)
+    })
+    );
+  }
  
   createWoman(womanData: Omit<Woman, 'id'>): Observable<Woman> {
   return this.http.post<Woman>(this.apiUrl, womanData).pipe(

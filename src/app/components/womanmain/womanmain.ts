@@ -34,15 +34,34 @@ export class Womanmain implements OnInit{
 
    onSubmit() {
     if (this.womanForm.valid) {
-      console.log('Form Submitted:', this.womanForm.value);      
+      console.log('Form Submitted:', this.womanForm.value);
       // Perform your API call or backend submission here
 
-      this.womanForm.reset(); // Reset the form after submission
+      const payload: Omit<Woman, "id"> = {
+        name: this.womanForm.value.name ?? "", // Fallback to an empty string if null/undefined
+        avatar: this.womanForm.value.avatar ?? undefined,
+        age: undefined,
+        status: this.womanForm.value.status ?? "",
+        dateOfBirth: this.womanForm.value.dateOfBirth ?? undefined,
+        country: this.womanForm.value.country ?? "",
+        race: this.womanForm.value.race ?? undefined,
+        email: this.womanForm.value.email ?? "",
+      };
+
+      this.womenService.createWomanv1(payload).subscribe({
+        next: (createdWoman) => {
+          console.log('Woman created:', createdWoman);
+          this.womanForm.reset(); // Reset the form after submission
+          this.loadWomen(); // Refresh the list of women after adding a new one
+        },
+        error: (err) => {
+          console.error('Error creating woman:', err);
+        }
+      });
     }else {
       console.log('Form is invalid. Please fill out all required fields correctly.');
       this.womanForm.markAllAsTouched(); // Mark all fields as touched to show validation errors
     }
-
 
    }
    loadWomen() {
@@ -91,8 +110,6 @@ export class Womanmain implements OnInit{
     this.closeForm(); // Close the form when a row is clicked
   }
 
- 
- 
    // Track whether the form is visible using a Signal
   isFormOpen = signal<boolean>(false);
 
