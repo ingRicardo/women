@@ -83,6 +83,7 @@ tr:hover {
   gap: 1rem;
   margin-top: 1.5rem;
   font-family: system-ui, -apple-system, sans-serif;
+  margin-bottom: 20px;
 }
 
  .pagination-btn {
@@ -125,3 +126,15 @@ tr:hover {
   color: #b4c6e2;
   font-weight: 500;
 }
+.details {
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #9e1d1d;
+  width: 100%;
+  overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+}
+
+ 

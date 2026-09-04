@@ -51,4 +51,13 @@ export class Womanmain implements OnInit{
       this.currentPage.update(p => p - 1);
     }
   }
+
+    // Writable signal to hold the selected row data
+  selectedWoman = signal<Woman | null>(null);
+
+  onRowClick(rowData: Woman): void {
+    console.log('Row Data Captured:', rowData);
+    this.selectedWoman.set(rowData); // Update the signal state
+  }
+
 }
