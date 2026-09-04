@@ -2,24 +2,50 @@ import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '
 import {WomanService} from '../../services/woman.service';
 import { Woman } from '../models/woman.model';
 import {NgOptimizedImage} from '@angular/common';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule,Validators } from '@angular/forms'; 
 
 @Component({
   selector: 'app-womanmain',
-  imports: [ NgOptimizedImage],
+  imports: [ NgOptimizedImage, ReactiveFormsModule],
   standalone: true,
   templateUrl: './womanmain.html',
   styleUrl: './womanmain.css',
 })
 
 export class Womanmain implements OnInit{
-onAddWoman() {
-  alert('under construction');
- }
- 
+
   private womenService = inject(WomanService);
   women = signal<Woman[]>([]);
 
-  ngOnInit(): void {
+   ngOnInit(): void {
+    this.loadWomen();
+   }
+
+   womanForm = new FormGroup({
+    name: new FormControl('', [Validators.required]),
+    avatar: new FormControl('', [Validators.required]),
+    age: new FormControl(null, [Validators.min(0)]),
+    status: new FormControl('', [Validators.required]),
+    dateOfBirth: new FormControl('', [Validators.required]),
+    country: new FormControl('', [Validators.required],), 
+    race: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email])
+   });
+
+   onSubmit() {
+    if (this.womanForm.valid) {
+      console.log('Form Submitted:', this.womanForm.value);      
+      // Perform your API call or backend submission here
+
+      this.womanForm.reset(); // Reset the form after submission
+    }else {
+      console.log('Form is invalid. Please fill out all required fields correctly.');
+      this.womanForm.markAllAsTouched(); // Mark all fields as touched to show validation errors
+    }
+
+
+   }
+   loadWomen() {
     console.log('Fetching women data...');
     this.womenService.getWomenv1().subscribe({
       next: (data) => {
@@ -30,7 +56,8 @@ onAddWoman() {
       }
     });
     console.log('Women data fetched:', this.women());
-  }
+   }
+
 
   currentPage = signal(1);
   pageSize = signal(5);
@@ -61,6 +88,20 @@ onAddWoman() {
   onRowClick(rowData: Woman): void {
     console.log('Row Data Captured:', rowData);
     this.selectedWoman.set(rowData); // Update the signal state
+    this.closeForm(); // Close the form when a row is clicked
+  }
+
+ 
+ 
+   // Track whether the form is visible using a Signal
+  isFormOpen = signal<boolean>(false);
+
+  openForm() {
+    this.isFormOpen.set(true);
+  }
+
+  closeForm() {
+    this.isFormOpen.set(false);
   }
 
 }

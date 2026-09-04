@@ -152,3 +152,12 @@ tr:hover {
  .add-btn:hover {
   background-color: #1d4ed8;  
  }
+
+ .input-field {
+  width: 100%;
+  padding: 8px;
+  margin: 4px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+ }
