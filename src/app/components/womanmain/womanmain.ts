@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, model, OnInit, signal } from '@angular/core';
 import {WomanService} from '../../services/woman.service';
 import { Woman } from '../models/woman.model';
 import {NgOptimizedImage} from '@angular/common';
@@ -6,7 +6,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule,Validators } f
 
 @Component({
   selector: 'app-womanmain',
-  imports: [ NgOptimizedImage, ReactiveFormsModule],
+  imports: [ NgOptimizedImage, FormsModule],
   standalone: true,
   templateUrl: './womanmain.html',
   styleUrl: './womanmain.css',
@@ -20,49 +20,42 @@ export class Womanmain implements OnInit{
    ngOnInit(): void {
     this.loadWomen();
    }
-
-   womanForm = new FormGroup({
-    name: new FormControl('', [Validators.required]),
-    avatar: new FormControl('', [Validators.required]),
-    age: new FormControl(null, [Validators.min(0)]),
-    status: new FormControl('', [Validators.required]),
-    dateOfBirth: new FormControl('', [Validators.required]),
-    country: new FormControl('', [Validators.required],), 
-    race: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required, Validators.email])
-   });
-
-   onSubmit() {
-    if (this.womanForm.valid) {
-      console.log('Form Submitted:', this.womanForm.value);
-      // Perform your API call or backend submission here
+ 
+    name = model('');
+    avatar = model('');
+    age = model(0);
+    status = model('');
+    dateOfBirth = model('');
+    country = model('');
+    race = model('');
+    email = model('');
+    
+   saveWoman() {
+ 
 
       const payload: Omit<Woman, "id"> = {
-        name: this.womanForm.value.name ?? "", // Fallback to an empty string if null/undefined
-        avatar: this.womanForm.value.avatar ?? undefined,
-        age: undefined,
-        status: this.womanForm.value.status ?? "",
-        dateOfBirth: this.womanForm.value.dateOfBirth ?? undefined,
-        country: this.womanForm.value.country ?? "",
-        race: this.womanForm.value.race ?? undefined,
-        email: this.womanForm.value.email ?? "",
+        name: this.name(), // Fallback to an empty string if null/undefined
+        avatar: this.avatar() ,
+        age: this.age(),
+        status:this.status(),
+        dateOfBirth: this.dateOfBirth(),
+        country: this.country(),
+        race: this.race(),
+        email: this.email(),
       };
 
+      console.log("payload", payload);
+ 
       this.womenService.createWomanv1(payload).subscribe({
         next: (createdWoman) => {
           console.log('Woman created:', createdWoman);
-          this.womanForm.reset(); // Reset the form after submission
-          this.loadWomen(); // Refresh the list of women after adding a new one
+           this.loadWomen(); // Refresh the list of women after adding a new one
         },
         error: (err) => {
           console.error('Error creating woman:', err);
         }
       });
-    }else {
-      console.log('Form is invalid. Please fill out all required fields correctly.');
-      this.womanForm.markAllAsTouched(); // Mark all fields as touched to show validation errors
-    }
-
+      
    }
    loadWomen() {
     console.log('Fetching women data...');
@@ -107,18 +100,7 @@ export class Womanmain implements OnInit{
   onRowClick(rowData: Woman): void {
     console.log('Row Data Captured:', rowData);
     this.selectedWoman.set(rowData); // Update the signal state
-    this.closeForm(); // Close the form when a row is clicked
-  }
+   }
 
-   // Track whether the form is visible using a Signal
-  isFormOpen = signal<boolean>(false);
-
-  openForm() {
-    this.isFormOpen.set(true);
-  }
-
-  closeForm() {
-    this.isFormOpen.set(false);
-  }
-
+ 
 }

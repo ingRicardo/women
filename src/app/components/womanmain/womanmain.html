@@ -64,58 +64,8 @@
 
     </div>
     @if(paginatedItems().length != 0) {
-        <!-- Clickable button to open the form -->
-        @if (!isFormOpen()) {
-        <button class="add-btn" (click)="openForm()">Add Woman</button>
-        }
 
-        <!-- The form section only renders when isFormOpen is true -->
-        @if (isFormOpen()) {
-        <div class="details">
-            <form [formGroup]="womanForm" (ngSubmit)="onSubmit()">
-                <h3>Add Woman Form</h3>
-                <div>
-                    <label for="name">Name:</label>
-                    <input class="input-field" type="text" id="name" name="name" formControlName="name" />
-                </div>
-                <div>
-                    <label for="avatar">Avatar URL:</label>
-                    <input class="input-field" type="text" id="avatar" name="avatar" formControlName="avatar" />
-                </div>
-                <div>
-                    <label for="age">Age:</label>
-                    <input class="input-field" type="number" id="age" name="age" formControlName="age" />
-                </div>
-                <div>
-                    <label for="status">Status:</label>
-                    <input class="input-field" type="text" id="status" name="status" formControlName="status" />
-                </div>
-                <div>
-                    <label for="dateOfBirth">Date of Birth:</label>
-                    <input class="input-field" type="date" id="dateOfBirth" name="dateOfBirth"
-                        formControlName="dateOfBirth" />
-                </div>
-                <div>
-                    <label for="country">Country:</label>
-                    <input class="input-field" type="text" id="country" name="country" formControlName="country" />
-                </div>
-                <div>
-                    <label for="race">Race:</label>
-                    <input class="input-field" type="text" id="race" name="race" formControlName="race" />
-                </div>
-                <div>
-                    <label for="email">Email:</label>
-                    <input class="input-field" type="email" id="email" name="email" formControlName="email" />
-                </div>
-
-                <div class="form-actions">
-                    <button class="add-btn" type="submit" [disabled]="womanForm.invalid">Submit</button>
-                    <!-- Optional button to close/hide the form again -->
-                    <button class="add-btn" type="button" (click)="closeForm()">Cancel</button>
-                </div>
-            </form>
-        </div>
-        }
+        
         @if (selectedWoman()) {
             <div class="details">
                 <h3>Selected Woman Details:</h3>
@@ -134,6 +84,48 @@
             </div>
 
         }
+                <div class="details">
+            <form>
+                <h3>Add Woman Form</h3>
+                <div>
+                    <label for="name">Name:</label>
+                    <input class="input-field" type="text" id="name" name="name"  [(ngModel)]="name" />
+                </div>
+                <div>
+                    <label for="avatar">Avatar URL:</label>
+                    <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" />
+                </div>
+                <div>
+                    <label for="age">Age:</label>
+                    <input class="input-field" type="number" id="age" name="age" [(ngModel)] ="age" />
+                </div>
+                <div>
+                    <label for="status">Status:</label>
+                    <input class="input-field" type="text" id="status" name="status" [(ngModel)] = "status" />
+                </div>
+                <div>
+                    <label for="dateOfBirth">Date of Birth:</label>
+                    <input class="input-field" type="date" id="dateOfBirth" name="dateOfBirth"[(ngModel)] = "dateOfBirth" />
+                </div>
+                <div>
+                    <label for="country">Country:</label>
+                    <input class="input-field" type="text" id="country" name="country" [(ngModel)] ="country" />
+                </div>
+                <div>
+                    <label for="race">Race:</label>
+                    <input class="input-field" type="text" id="race" name="race"  [(ngModel)] = "race" />
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input class="input-field" type="email" id="email" name="email" [(ngModel)] = "email" />
+                </div>
+
+                <div class="form-actions">
+                    <button class="add-btn" type="button" (click) = "saveWoman()" >Save</button>
+                     
+                </div>
+            </form>
+        </div>
     }
 
 
