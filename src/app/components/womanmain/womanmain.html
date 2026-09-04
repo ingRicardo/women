@@ -18,17 +18,17 @@
                 </tr>
             </thead>
             <tbody>
-                @for (item of paginatedItems(); track item.id) {
-                <tr>
-                    <td>{{item.id}}</td>
-                    <td>{{item.name}}</td>
-                    <td><img width="50" height="50" ngSrc='{{item.avatar}}' alt="Avatar" class="avatar" priority></td>
-                    <td>{{item.age}}</td>
-                    <td>{{item.status}}</td>
-                    <td>{{item.dateOfBirth }}</td>
-                    <td>{{item.country}}</td>
-                    <td>{{item.race}}</td>
-                    <td>{{item.email}}</td>
+                @for (woman of paginatedItems(); track woman.id) {
+                <tr (click)="onRowClick(woman)">
+                    <td>{{woman.id}}</td>
+                    <td>{{woman.name}}</td>
+                    <td><img width="50" height="50" ngSrc='{{woman.avatar}}' alt="Avatar" class="avatar" priority></td>
+                    <td>{{woman.age}}</td>
+                    <td>{{woman.status}}</td>
+                    <td>{{woman.dateOfBirth }}</td>
+                    <td>{{woman.country}}</td>
+                    <td>{{woman.race}}</td>
+                    <td>{{woman.email}}</td>
                 </tr>
                 }@empty {
                 <tr>
@@ -61,5 +61,22 @@
                 Next
             </button>
         </div>
+
     </div>
+    @if (selectedWoman()) {
+        <div class="details">
+            <h3>Selected Woman Details:</h3>
+            <p><strong>ID:</strong> {{ selectedWoman()?.id }}</p>
+            <p><strong>Name:</strong> {{ selectedWoman()?.name }}</p>
+            <p><strong>Avatar:</strong> <img  ngSrc='{{selectedWoman()?.avatar}}' alt="Avatar"
+                    class="avatar" priority></p>
+            <p><strong>Age:</strong> {{ selectedWoman()?.age }}</p>
+            <p><strong>Status:</strong> {{ selectedWoman()?.status }}</p>
+            <p><strong>Date of Birth:</strong> {{ selectedWoman()?.dateOfBirth }}</p>
+            <p><strong>Country:</strong> {{ selectedWoman()?.country }}</p>
+            <p><strong>Race:</strong> {{ selectedWoman()?.race }}</p>
+            <p><strong>Email:</strong> {{ selectedWoman()?.email }}</p>
+
+        </div>
+    }
 </div>
