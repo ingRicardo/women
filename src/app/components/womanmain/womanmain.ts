@@ -12,6 +12,9 @@ import {NgOptimizedImage} from '@angular/common';
 })
 
 export class Womanmain implements OnInit{
+onAddWoman() {
+  alert('under construction');
+ }
  
   private womenService = inject(WomanService);
   women = signal<Woman[]>([]);
