@@ -48,24 +48,14 @@ export class Womanmain implements OnInit{
       this.womenService.createWomanv1(payload).subscribe({
         next: (response) => {
           console.log("women created succesfully!", response);
-          
+          this.loadWomen();
         },
         error: (error) => {
           console.error('Registration failed', error);
+           this.loadWomen();
         }
       });
- /*
-      this.womenService.createWomanv1(payload).subscribe({
-        next: (createdWoman) => {
-          console.log('Woman created:', createdWoman);
-          //this.loadWomen(); // Refresh the list of women after adding a new one
-
-        },
-        error: (err) => {
-          console.error('Error creating woman:', err);
-        }
-      });
-      */
+ 
    }
    loadWomen() {
     console.log('Fetching women data...');
