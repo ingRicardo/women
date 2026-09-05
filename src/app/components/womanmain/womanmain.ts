@@ -41,21 +41,31 @@ export class Womanmain implements OnInit{
         dateOfBirth: this.dateOfBirth(),
         country: this.country(),
         race: this.race(),
-        email: this.email(),
+        email: this.email()
       };
 
       console.log("payload", payload);
- 
+      this.womenService.createWomanv1(payload).subscribe({
+        next: (response) => {
+          console.log("women created succesfully!", response);
+          
+        },
+        error: (error) => {
+          console.error('Registration failed', error);
+        }
+      });
+ /*
       this.womenService.createWomanv1(payload).subscribe({
         next: (createdWoman) => {
           console.log('Woman created:', createdWoman);
-           this.loadWomen(); // Refresh the list of women after adding a new one
+          //this.loadWomen(); // Refresh the list of women after adding a new one
+
         },
         error: (err) => {
           console.error('Error creating woman:', err);
         }
       });
-      
+      */
    }
    loadWomen() {
     console.log('Fetching women data...');
