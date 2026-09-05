@@ -16,11 +16,11 @@ export class Womanmain implements OnInit{
 
   private womenService = inject(WomanService);
   women = signal<Woman[]>([]);
-
+  
    ngOnInit(): void {
     this.loadWomen();
    }
- 
+   
     name = model('');
     avatar = model('');
     age = model(0);
@@ -48,12 +48,13 @@ export class Womanmain implements OnInit{
       this.womenService.createWomanv1(payload).subscribe({
         next: (response) => {
           console.log("women created succesfully!", response);
+          alert("women created succesfully!");
           this.loadWomen();
         },
         error: (error) => {
           this.loadWomen();
           console.error('Registration failed', error);
-           
+          alert("women created succesfully");
         }
       });
         this.loadWomen();
