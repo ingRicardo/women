@@ -20,11 +20,7 @@ export class WomanService {
   
   getWomenv1(): Observable<Woman[]> {
     console.log('Fetching women data from API...');
-    return this.http.get<Woman[]>(this.apiUrl,{
-    headers: new HttpHeaders({
-       'ng-skip-http-transfer-cache': 'true'
-    })
-  }).pipe(
+    return this.http.get<Woman[]>(this.apiUrl).pipe(
       tap({
       next: (data) => console.log('Raw data received by service:', data),
       error: (err) => console.error('Service error:', err)
@@ -48,8 +44,25 @@ export class WomanService {
       timeout(30000)
     );
   }
+/*
+  createWomanv1(womanData: Omit<Woman, 'id'>): Observable<womanData> {
+    console.log('Creating woman with from service :', womanData);
+    return this.http.post<Woman>(this.apiUrl, womanData);
+  }
+ */
+    createWomanv1(womanData: Omit<Woman, 'id'>): Observable<Woman> {
+      return this.http.post<Woman>(this.apiUrl, womanData);/* .pipe(
+       retry({ count: 3, delay: 3000 }),
+        timeout(60000),
+        tap((newUser) => {
+          // Append new record immediately to state signal
+          this.womenSignal.update((current) => [...current, newUser]);
+        })
+      );*/
+    }
+  
 
- 
+
   createWoman(womanData: Omit<Woman, 'id'>): Observable<Woman> {
   return this.http.post<Woman>(this.apiUrl, womanData).pipe(
     retry({ count: 3, delay: 3000 }),

@@ -1,25 +1,65 @@
-import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, model, OnInit, signal } from '@angular/core';
 import {WomanService} from '../../services/woman.service';
 import { Woman } from '../models/woman.model';
 import {NgOptimizedImage} from '@angular/common';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule,Validators } from '@angular/forms'; 
 
 @Component({
   selector: 'app-womanmain',
-  imports: [ NgOptimizedImage],
+  imports: [ NgOptimizedImage, FormsModule],
   standalone: true,
   templateUrl: './womanmain.html',
   styleUrl: './womanmain.css',
 })
 
 export class Womanmain implements OnInit{
-onAddWoman() {
-  alert('under construction');
- }
- 
+
   private womenService = inject(WomanService);
   women = signal<Woman[]>([]);
+  
+   ngOnInit(): void {
+    this.loadWomen();
+   }
+   
+    name = model('');
+    avatar = model('');
+    age = model(0);
+    status = model('');
+    dateOfBirth = model('');
+    country = model('');
+    race = model('');
+    email = model('');
+    
+   saveWoman() {
+ 
 
-  ngOnInit(): void {
+      const payload: Omit<Woman, "id"> = {
+        name: this.name(), // Fallback to an empty string if null/undefined
+        avatar: this.avatar() ,
+        age: this.age(),
+        status:this.status(),
+        dateOfBirth: this.dateOfBirth(),
+        country: this.country(),
+        race: this.race(),
+        email: this.email()
+      };
+
+      console.log("payload", payload);
+      this.womenService.createWomanv1(payload).subscribe({
+        next: (response) => {
+          console.log("women created succesfully!", response);
+          alert("women created succesfully!");
+          this.loadWomen();
+        },
+        error: (error) => {
+          this.loadWomen();
+          console.error('Registration failed', error);
+          alert("women created succesfully");
+        }
+      });
+        this.loadWomen();
+   }
+   loadWomen() {
     console.log('Fetching women data...');
     this.womenService.getWomenv1().subscribe({
       next: (data) => {
@@ -30,7 +70,8 @@ onAddWoman() {
       }
     });
     console.log('Women data fetched:', this.women());
-  }
+   }
+
 
   currentPage = signal(1);
   pageSize = signal(5);
@@ -61,6 +102,7 @@ onAddWoman() {
   onRowClick(rowData: Woman): void {
     console.log('Row Data Captured:', rowData);
     this.selectedWoman.set(rowData); // Update the signal state
-  }
+   }
 
+ 
 }
