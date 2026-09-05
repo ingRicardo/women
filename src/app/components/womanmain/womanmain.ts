@@ -51,11 +51,12 @@ export class Womanmain implements OnInit{
           this.loadWomen();
         },
         error: (error) => {
+          this.loadWomen();
           console.error('Registration failed', error);
-           this.loadWomen();
+           
         }
       });
- 
+        this.loadWomen();
    }
    loadWomen() {
     console.log('Fetching women data...');
