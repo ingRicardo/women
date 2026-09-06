@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, computed, inject, model, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, effect, inject, model, OnInit, signal } from '@angular/core';
 import {WomanService} from '../../services/woman.service';
 import { Woman } from '../models/woman.model';
 import {NgOptimizedImage} from '@angular/common';
@@ -16,11 +16,18 @@ export class Womanmain implements OnInit{
 
   private womenService = inject(WomanService);
   women = signal<Woman[]>([]);
-  
+  isLoading = signal<boolean>(false);
+
    ngOnInit(): void {
     this.loadWomen();
    }
-   
+    constructor() {
+       effect(() => {
+        const currentWomenList = this.women();
+        console.log('The women list has changed!', currentWomenList);
+        this.isLoading.set(false);
+      });
+    }
     name = model('');
     avatar = model('');
     age = model(0);
@@ -31,8 +38,6 @@ export class Womanmain implements OnInit{
     email = model('');
     
    saveWoman() {
- 
-
       const payload: Omit<Woman, "id"> = {
         name: this.name(), // Fallback to an empty string if null/undefined
         avatar: this.avatar() ,
@@ -49,15 +54,27 @@ export class Womanmain implements OnInit{
         next: (response) => {
           console.log("women created succesfully!", response);
           alert("women created succesfully!");
+            this.name.set('');
+            this.avatar.set('');
+            this.age.set(0);
+            this.status.set('');
+            this.dateOfBirth.set('');
+            this.country.set('');
+            this.race.set('');
+            this.email.set('');
           this.loadWomen();
+          this.isLoading.set(true);
+
         },
         error: (error) => {
           this.loadWomen();
           console.error('Registration failed', error);
           alert("women created succesfully");
-        }
+         }
       });
-        this.loadWomen();
+      this.isLoading.set(false);
+      this.loadWomen();
+ 
    }
    loadWomen() {
     console.log('Fetching women data...');
@@ -70,8 +87,14 @@ export class Womanmain implements OnInit{
       }
     });
     console.log('Women data fetched:', this.women());
-   }
+    this.isLoading.set(false);
+    }
 
+    checkifloading(){
+    if (this.isLoading())
+      return true;
+    else return false;
+   }
 
   currentPage = signal(1);
   pageSize = signal(5);
@@ -96,7 +119,6 @@ export class Womanmain implements OnInit{
     }
   }
 
-    // Writable signal to hold the selected row data
   selectedWoman = signal<Woman | null>(null);
 
   onRowClick(rowData: Woman): void {
