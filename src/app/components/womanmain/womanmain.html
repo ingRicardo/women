@@ -46,6 +46,19 @@
                     </td>
                 </tr>
                 }
+                @if(checkifloading()==true){
+                <tr>
+                    <td colspan="9" class="empty-table-messagev2">loading... </td>
+                </tr>
+                <tr>
+                    <td colspan="9">
+                        <div class="table-spinner-container">
+                            <div class="spinner"></div>
+                        </div>
+
+                    </td>
+                </tr>
+                }
             </tbody>
         </table>
         <div class="pagination-controls">
@@ -84,48 +97,50 @@
             </div>
 
         }
-                <div class="details">
-            <form>
-                <h3>Add Woman Form</h3>
-                <div>
-                    <label for="name">Name:</label>
-                    <input class="input-field" type="text" id="name" name="name"  [(ngModel)]="name" />
-                </div>
-                <div>
-                    <label for="avatar">Avatar URL:</label>
-                    <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" />
-                </div>
-                <div>
-                    <label for="age">Age:</label>
-                    <input class="input-field" type="number" id="age" name="age" [(ngModel)] ="age" />
-                </div>
-                <div>
-                    <label for="status">Status:</label>
-                    <input class="input-field" type="text" id="status" name="status" [(ngModel)] = "status" />
-                </div>
-                <div>
-                    <label for="dateOfBirth">Date of Birth:</label>
-                    <input class="input-field" type="date" id="dateOfBirth" name="dateOfBirth"[(ngModel)] = "dateOfBirth" />
-                </div>
-                <div>
-                    <label for="country">Country:</label>
-                    <input class="input-field" type="text" id="country" name="country" [(ngModel)] ="country" />
-                </div>
-                <div>
-                    <label for="race">Race:</label>
-                    <input class="input-field" type="text" id="race" name="race"  [(ngModel)] = "race" />
-                </div>
-                <div>
-                    <label for="email">Email:</label>
-                    <input class="input-field" type="email" id="email" name="email" [(ngModel)] = "email" />
-                </div>
+         @if(checkifloading()==false){
+            <div class="details">
+                <form>
+                    <h3>Add Woman Form</h3>
+                    <div>
+                        <label for="name">Name:</label>
+                        <input class="input-field" type="text" id="name" name="name"  [(ngModel)]="name" />
+                    </div>
+                    <div>
+                        <label for="avatar">Avatar URL:</label>
+                        <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" />
+                    </div>
+                    <div>
+                        <label for="age">Age:</label>
+                        <input class="input-field" type="number" id="age" name="age" [(ngModel)] ="age" />
+                    </div>
+                    <div>
+                        <label for="status">Status:</label>
+                        <input class="input-field" type="text" id="status" name="status" [(ngModel)] = "status" />
+                    </div>
+                    <div>
+                        <label for="dateOfBirth">Date of Birth:</label>
+                        <input class="input-field" type="date" id="dateOfBirth" name="dateOfBirth"[(ngModel)] = "dateOfBirth" />
+                    </div>
+                    <div>
+                        <label for="country">Country:</label>
+                        <input class="input-field" type="text" id="country" name="country" [(ngModel)] ="country" />
+                    </div>
+                    <div>
+                        <label for="race">Race:</label>
+                        <input class="input-field" type="text" id="race" name="race"  [(ngModel)] = "race" />
+                    </div>
+                    <div>
+                        <label for="email">Email:</label>
+                        <input class="input-field" type="email" id="email" name="email" [(ngModel)] = "email" />
+                    </div>
 
-                <div class="form-actions">
-                    <button class="add-btn" type="button" (click) = "saveWoman()" >Save</button>
-                     
-                </div>
-            </form>
-        </div>
+                    <div class="form-actions">
+                        <button class="add-btn" type="button" (click) = "saveWoman()" >Save</button>
+                        
+                    </div>
+                </form>
+            </div>
+        }
     }
 
 

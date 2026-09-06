@@ -37,28 +37,15 @@ export class WomanService {
   );
 }
 
-
   getWomanById(id: number): Observable<Woman> {
     return this.http.get<Woman>(`${this.apiUrl}/${id}`).pipe(
       retry({ count: 2, delay: 2000 }),
       timeout(30000)
     );
   }
-/*
-  createWomanv1(womanData: Omit<Woman, 'id'>): Observable<womanData> {
-    console.log('Creating woman with from service :', womanData);
-    return this.http.post<Woman>(this.apiUrl, womanData);
-  }
- */
+ 
     createWomanv1(womanData: Omit<Woman, 'id'>): Observable<Woman> {
-      return this.http.post<Woman>(this.apiUrl, womanData);/* .pipe(
-       retry({ count: 3, delay: 3000 }),
-        timeout(60000),
-        tap((newUser) => {
-          // Append new record immediately to state signal
-          this.womenSignal.update((current) => [...current, newUser]);
-        })
-      );*/
+      return this.http.post<Woman>(this.apiUrl, womanData);
     }
   
 
