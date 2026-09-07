@@ -116,16 +116,31 @@
                         <input class="input-field" type="text" id="name" name="name"  [(ngModel)]="name" />
                     </div>
                     <div>
+                        
                         <label for="avatar">Avatar URL:</label>
-                        <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" />
+                        <div class="input-with-preview">
+                        <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" placeholder="https://colombiaone.com/wp-content/uploads/2025/05/gabriela-tafur-credit-paul-saad-CC-BY-NC-ND-2.0-flickr-1536x1024.jpg.webp"/>
+                         <!-- Preview Icon -->
+                        @if (avatar()) {
+                        <img [src]="avatar()" alt="Invalid" class="avatar-preview-icon" />
+                        }
+                        </div>
                     </div>
                     <div>
                         <label for="age">Age:</label>
                         <input class="input-field" type="number" id="age" name="age" [(ngModel)] ="age" />
                     </div>
-                    <div>
-                        <label for="status">Status:</label>
-                        <input class="input-field" type="text" id="status" name="status" [(ngModel)] = "status" />
+                    <div> 
+                    <label for="status">Status:</label> 
+                        <select class="input-field" id="status" name="status" [(ngModel)]="status">
+                            <option value="" disabled selected>Select a status</option>
+                            <option value="single">Single</option>
+                            <option value="married">Married</option>
+                            <option value="divorced">Divorced</option>
+                            <option value="widowed">Widowed</option>
+                            <option value="separated">Separated</option>
+                            <option value="commonlawdomesticpartner">Common-Law / Domestic Partner</option>
+                        </select> 
                     </div>
                     <div>
                         <label for="dateOfBirth">Date of Birth:</label>
