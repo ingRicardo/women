@@ -21,12 +21,26 @@ export class Womanmain implements OnInit{
    ngOnInit(): void {
     this.loadWomen();
    }
-    constructor() {
+    constructor( ) {
        effect(() => {
         const currentWomenList = this.women();
         console.log('The women list has changed!', currentWomenList);
         this.isLoading.set(false);
       });
+    }
+     
+    alertMessage = signal<string | null>(null);
+    alertType = signal<'success' | 'error' | null>(null);
+
+     
+    showAlert(message: string, type: 'success' | 'error') {
+      this.alertMessage.set(message);
+      this.alertType.set(type);
+
+      setTimeout(() => {
+        this.alertMessage.set(null);
+        this.alertType.set(null);
+      }, 5000);
     }
     name = model('');
     avatar = model('');
@@ -53,7 +67,7 @@ export class Womanmain implements OnInit{
       this.womenService.createWomanv1(payload).subscribe({
         next: (response) => {
           console.log("women created succesfully!", response);
-          alert("women created succesfully!");
+          this.showAlert("Woman created successfully!", "success");
             this.name.set('');
             this.avatar.set('');
             this.age.set(0);
@@ -69,7 +83,7 @@ export class Womanmain implements OnInit{
         error: (error) => {
           this.loadWomen();
           console.error('Registration failed', error);
-          alert("women created succesfully");
+          this.showAlert("Error creating profile. Please try again.", "error");
          }
       });
       this.isLoading.set(false);
@@ -81,12 +95,13 @@ export class Womanmain implements OnInit{
     this.womenService.getWomenv1().subscribe({
       next: (data) => {
         this.women.set(data);
+        console.log('Women data fetched:', this.women());
+
        },
       error: (err) => {
         console.error('Error fetching women:', err);
       }
     });
-    console.log('Women data fetched:', this.women());
     this.isLoading.set(false);
     }
 
