@@ -133,6 +133,16 @@ export class Womanmain implements OnInit{
       this.currentPage.update(p => p - 1);
     }
   }
+  firstPage(){
+    if(this.currentPage() >= 1){
+      this.currentPage.update(p => 1);
+    }
+  }
+  lastPage(){
+    if(this.currentPage() >= 1){
+      this.currentPage.update(p => this.totalPages());
+    }
+  }
 
   selectedWoman = signal<Woman | null>(null);
 

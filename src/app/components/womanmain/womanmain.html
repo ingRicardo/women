@@ -66,6 +66,9 @@
             </tbody>
         </table>
         <div class="pagination-controls">
+            <button class="pagination-btn" (click)="firstPage()" [disabled]="currentPage() === 1">
+                <<
+            </button>
             <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage() === 1">
                 Previous
             </button>
@@ -76,6 +79,9 @@
 
             <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage() === totalPages()">
                 Next
+            </button>
+            <button class="pagination-btn" (click)="lastPage()" [disabled]="currentPage() === totalPages()">
+                >>
             </button>
         </div>
 
