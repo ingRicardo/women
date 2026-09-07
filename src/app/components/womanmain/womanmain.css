@@ -161,3 +161,42 @@ tr:hover {
   border: 1px solid #ccc;
   border-radius: 4px;
  }
+
+ .custom-alert {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #ffffff;
+  font-family: sans-serif;
+  font-weight: 500;
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+}
+
+ .custom-alert.success {
+  background-color: #2ec4b6;
+  border-left: 5px solid #011627;
+}
+
+ .custom-alert.error {
+  background-color: #e71d36;
+  border-left: 5px solid #ff9f1c;
+}
+
+ .custom-alert p {
+  margin: 0;
+}
+
+ @keyframes slideIn {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
