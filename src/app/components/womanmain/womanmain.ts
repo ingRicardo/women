@@ -134,6 +134,17 @@ export class Womanmain implements OnInit{
     }
   }
 
+  firstPage(){
+    if(this.currentPage() >= 1){
+      this.currentPage.update(p => 1);
+    }
+  }
+  lastPage(){
+    if(this.currentPage() >= 1){
+      this.currentPage.update(p => this.totalPages());
+    }
+  }
+
   selectedWoman = signal<Woman | null>(null);
 
   onRowClick(rowData: Woman): void {
