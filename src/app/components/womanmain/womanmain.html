@@ -134,12 +134,12 @@
                     <label for="status">Status:</label> 
                         <select class="input-field" id="status" name="status" [(ngModel)]="status">
                             <option value="" disabled selected>Select a status</option>
-                            <option value="single">Single</option>
-                            <option value="married">Married</option>
-                            <option value="divorced">Divorced</option>
-                            <option value="widowed">Widowed</option>
-                            <option value="separated">Separated</option>
-                            <option value="commonlawdomesticpartner">Common-Law / Domestic Partner</option>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Widowed">Widowed</option>
+                            <option value="Separated">Separated</option>
+                            <option value="Common-Law / Domestic Partner">Common-Law / Domestic Partner</option>
                         </select> 
                     </div>
                     <div>
@@ -150,9 +150,21 @@
                         <label for="country">Country:</label>
                         <input class="input-field" type="text" id="country" name="country" [(ngModel)] ="country" />
                     </div>
-                    <div>
-                        <label for="race">Race:</label>
-                        <input class="input-field" type="text" id="race" name="race"  [(ngModel)] = "race" />
+                    <div> 
+                        <label for="race">Race:</label> 
+                        <select class="input-field" id="race" name="race" [(ngModel)]="race">
+                            <option value="" disabled selected>Select race</option>
+                            <option value="Black">Black</option>
+                            <option value="Hispanic">Hispanic</option>
+                            <option value="Native">Native</option>
+                            <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+                            <option value="Asian">Asian</option>
+                            <option value="Black or African American">Black or African American</option>
+                            <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
+                            <option value="White">White</option>
+                            <option value="Two or More Races">Two or More Races</option>
+                            <option value="Other / Decline to State">Other / Decline to State</option>
+                        </select> 
                     </div>
                     <div>
                         <label for="email">Email:</label>
