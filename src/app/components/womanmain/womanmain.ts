@@ -14,10 +14,19 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule,Validators } f
 
 export class Womanmain implements OnInit{
 
+
+
+  openAdd() {
+    this.isAddopen.set(true);
+  }
+  closeAdd(){
+    this.isAddopen.set(false);
+  }
+
   private womenService = inject(WomanService);
   women = signal<Woman[]>([]);
   isLoading = signal<boolean>(false);
-
+  isAddopen = signal<boolean>(false);
    ngOnInit(): void {
     this.loadWomen();
    }
