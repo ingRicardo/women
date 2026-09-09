@@ -18,6 +18,8 @@ export class Womanmain implements OnInit{
   
   @ViewChild('womanId') womanIdElement!: ElementRef<HTMLInputElement>;
 
+  @ViewChild('womanAvatar') womanAvatarElement!: ElementRef<HTMLInputElement>;
+
   editWoman() {
    this.isEdit.set(true);
   }
@@ -30,7 +32,8 @@ export class Womanmain implements OnInit{
     if(this.womanNameElement && this.womanIdElement){
       const inputNameValue = this.womanNameElement.nativeElement.value;
       const womanIDValue = this.womanIdElement.nativeElement.value;
-      console.log(womanIDValue, inputNameValue);
+      const womanAvatarValue = this.womanAvatarElement.nativeElement.value;
+      console.log(womanIDValue, inputNameValue, womanAvatarValue);
     }
 
   }
