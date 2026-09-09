@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, computed, effect, inject, model, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, effect, ElementRef, inject, model, OnInit, signal, ViewChild } from '@angular/core';
 import {WomanService} from '../../services/woman.service';
 import { Woman } from '../models/woman.model';
 import {NgOptimizedImage} from '@angular/common';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule,Validators } from '@angular/forms'; 
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule,Validators,  } from '@angular/forms'; 
 
 @Component({
   selector: 'app-womanmain',
@@ -14,7 +14,26 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule,Validators } f
 
 export class Womanmain implements OnInit{
 
+  @ViewChild('womanName') womanNameElement!: ElementRef<HTMLInputElement>;
+  
+  @ViewChild('womanId') womanIdElement!: ElementRef<HTMLInputElement>;
 
+  editWoman() {
+   this.isEdit.set(true);
+  }
+  canceEditWoman(){
+    this.isEdit.set(false);
+  }
+  
+  updateWoman(){
+
+    if(this.womanNameElement && this.womanIdElement){
+      const inputNameValue = this.womanNameElement.nativeElement.value;
+      const womanIDValue = this.womanIdElement.nativeElement.value;
+      console.log(womanIDValue, inputNameValue);
+    }
+
+  }
 
   openAdd() {
     this.isAddopen.set(true);
@@ -27,6 +46,8 @@ export class Womanmain implements OnInit{
   women = signal<Woman[]>([]);
   isLoading = signal<boolean>(false);
   isAddopen = signal<boolean>(false);
+  isEdit = signal<boolean>(false);
+
    ngOnInit(): void {
     this.loadWomen();
    }
@@ -157,6 +178,7 @@ export class Womanmain implements OnInit{
   selectedWoman = signal<Woman | null>(null);
 
   onRowClick(rowData: Woman): void {
+    this.isEdit.set(false);
     console.log('Row Data Captured:', rowData);
     this.selectedWoman.set(rowData); // Update the signal state
    }
