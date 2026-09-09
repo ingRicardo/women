@@ -89,7 +89,7 @@
     @if(paginatedItems().length != 0) {
 
         
-        @if (selectedWoman()) {
+        @if (selectedWoman() && isAddopen() == false) {
             <div class="details">
                 <h3>Selected Woman Details:</h3>
                 <p><strong>ID:</strong> {{ selectedWoman()?.id }}</p>
@@ -107,77 +107,82 @@
             </div>
 
         }
-         @if(checkifloading()==false){
-            <div class="details">
-                <form>
-                    <h3>Add Woman Form</h3>
-                    <div>
-                        <label for="name">Name:</label>
-                        <input class="input-field" type="text" id="name" name="name"  [(ngModel)]="name" />
-                    </div>
-                    <div>
-                        
-                        <label for="avatar">Avatar URL:</label>
-                        <div class="input-with-preview">
-                        <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" placeholder="https://colombiaone.com/wp-content/uploads/2025/05/gabriela-tafur-credit-paul-saad-CC-BY-NC-ND-2.0-flickr-1536x1024.jpg.webp"/>
-                         <!-- Preview Icon -->
-                        @if (avatar()) {
-                        <img [src]="avatar()" alt="Invalid" class="avatar-preview-icon" />
-                        }
-                        </div>
-                    </div>
-                    <div>
-                        <label for="age">Age:</label>
-                        <input class="input-field" type="number" id="age" name="age" [(ngModel)] ="age" />
-                    </div>
-                    <div> 
-                    <label for="status">Status:</label> 
-                        <select class="input-field" id="status" name="status" [(ngModel)]="status">
-                            <option value="" disabled selected>Select a status</option>
-                            <option value="Single">Single</option>
-                            <option value="Married">Married</option>
-                            <option value="Divorced">Divorced</option>
-                            <option value="Widowed">Widowed</option>
-                            <option value="Separated">Separated</option>
-                            <option value="Common-Law / Domestic Partner">Common-Law / Domestic Partner</option>
-                        </select> 
-                    </div>
-                    <div>
-                        <label for="dateOfBirth">Date of Birth:</label>
-                        <input class="input-field" type="date" id="dateOfBirth" name="dateOfBirth"[(ngModel)] = "dateOfBirth" />
-                    </div>
-                    <div>
-                        <label for="country">Country:</label>
-                        <input class="input-field" type="text" id="country" name="country" [(ngModel)] ="country" />
-                    </div>
-                    <div> 
-                        <label for="race">Race:</label> 
-                        <select class="input-field" id="race" name="race" [(ngModel)]="race">
-                            <option value="" disabled selected>Select race</option>
-                            <option value="Black">Black</option>
-                            <option value="Hispanic">Hispanic</option>
-                            <option value="Native">Native</option>
-                            <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
-                            <option value="Asian">Asian</option>
-                            <option value="Black or African American">Black or African American</option>
-                            <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
-                            <option value="White">White</option>
-                            <option value="Two or More Races">Two or More Races</option>
-                            <option value="Other / Decline to State">Other / Decline to State</option>
-                        </select> 
-                    </div>
-                    <div>
-                        <label for="email">Email:</label>
-                        <input class="input-field" type="email" id="email" name="email" [(ngModel)] = "email" />
-                    </div>
 
-                    <div class="form-actions">
-                        <button class="add-btn" type="button" (click) = "saveWoman()" >Save</button>
-                        
-                    </div>
-                </form>
-            </div>
-        }
+         @if(checkifloading()==false){
+            <div><button class="add-btn" type="button" (click)="openAdd()">Add</button></div>
+         }
+            @if (isAddopen()){
+                <div class="details">
+                    <form>
+                        <h3>Add Woman Form</h3>
+                        <div>
+                            <label for="name">Name:</label>
+                            <input class="input-field" type="text" id="name" name="name"  [(ngModel)]="name" />
+                        </div>
+                        <div>
+                            
+                            <label for="avatar">Avatar URL:</label>
+                            <div class="input-with-preview">
+                            <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" placeholder="https://colombiaone.com/wp-content/uploads/2025/05/gabriela-tafur-credit-paul-saad-CC-BY-NC-ND-2.0-flickr-1536x1024.jpg.webp"/>
+                            <!-- Preview Icon -->
+                            @if (avatar()) {
+                            <img [src]="avatar()" alt="Invalid" class="avatar-preview-icon" />
+                            }
+                            </div>
+                        </div>
+                        <div>
+                            <label for="age">Age:</label>
+                            <input class="input-field" type="number" id="age" name="age" [(ngModel)] ="age" />
+                        </div>
+                        <div> 
+                        <label for="status">Status:</label> 
+                            <select class="input-field" id="status" name="status" [(ngModel)]="status">
+                                <option value="" disabled selected>Select a status</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
+                                <option value="Separated">Separated</option>
+                                <option value="Common-Law / Domestic Partner">Common-Law / Domestic Partner</option>
+                            </select> 
+                        </div>
+                        <div>
+                            <label for="dateOfBirth">Date of Birth:</label>
+                            <input class="input-field" type="date" id="dateOfBirth" name="dateOfBirth"[(ngModel)] = "dateOfBirth" />
+                        </div>
+                        <div>
+                            <label for="country">Country:</label>
+                            <input class="input-field" type="text" id="country" name="country" [(ngModel)] ="country" />
+                        </div>
+                        <div> 
+                            <label for="race">Race:</label> 
+                            <select class="input-field" id="race" name="race" [(ngModel)]="race">
+                                <option value="" disabled selected>Select race</option>
+                                <option value="Black">Black</option>
+                                <option value="Hispanic">Hispanic</option>
+                                <option value="Native">Native</option>
+                                <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+                                <option value="Asian">Asian</option>
+                                <option value="Black or African American">Black or African American</option>
+                                <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
+                                <option value="White">White</option>
+                                <option value="Two or More Races">Two or More Races</option>
+                                <option value="Other / Decline to State">Other / Decline to State</option>
+                            </select> 
+                        </div>
+                        <div>
+                            <label for="email">Email:</label>
+                            <input class="input-field" type="email" id="email" name="email" [(ngModel)] = "email" />
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="add-btn" type="button" (click) = "saveWoman()" >Save</button>
+                            <button class="add-btn" type="button" (click)= "closeAdd()">Close</button>
+                        </div>
+                    </form>
+                </div>
+            }
+        
     }
 
     @if (alertMessage()) {
