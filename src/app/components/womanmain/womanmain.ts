@@ -19,6 +19,7 @@ export class Womanmain implements OnInit{
   @ViewChild('womanId') womanIdElement!: ElementRef<HTMLInputElement>;
 
   @ViewChild('womanAvatar') womanAvatarElement!: ElementRef<HTMLInputElement>;
+  @ViewChild('womanStatus') womanStatusElement!: ElementRef<HTMLSelectElement>;
 
   editWoman() {
    this.isEdit.set(true);
@@ -33,7 +34,8 @@ export class Womanmain implements OnInit{
       const inputNameValue = this.womanNameElement.nativeElement.value;
       const womanIDValue = this.womanIdElement.nativeElement.value;
       const womanAvatarValue = this.womanAvatarElement.nativeElement.value;
-      console.log(womanIDValue, inputNameValue, womanAvatarValue);
+      const womanStatusValue = this.womanStatusElement.nativeElement.value;
+       console.log(womanIDValue, inputNameValue, womanAvatarValue, womanStatusValue );
     }
 
   }

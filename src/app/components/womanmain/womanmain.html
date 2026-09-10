@@ -94,8 +94,11 @@
             <div class="details">
                  <div class="form-actions">
                     <button class="add-btn" type="button" (click)="editWoman()">Edit</button>
+                    @if(isEdit() == true){
                     <button class="add-btn" type="button" (click)="updateWoman()">Update</button>
                     <button class="add-btn" type="button" (click)="canceEditWoman()">Cancel</button>
+                    }
+                    
                 </div>
                 <h3>Selected Woman Details:</h3>
                      @if(isEdit() == true){
@@ -105,8 +108,7 @@
                      }@else {
                         <p ><strong>ID:</strong> {{ selectedWoman()?.id }}</p>
                      }
-                   
-                    
+
                     @if(isEdit() == true){
                         <p><strong>Name:</strong> <input  #womanName
                             class="input-field" type="text"  [value]="selectedWoman()?.name || ''" /></p>
@@ -115,22 +117,64 @@
                     }
 
                     @if (isEdit() == true){
-                        <p><strong>Avatar:</strong>
+                        <p><strong>Avatar:</strong> </p>
                       <!--  <img width="100%" height="100%" src='{{selectedWoman()?.avatar}}' alt="Avatar">-->
-                        <input #womanAvatar class="input-field" type="text"  [value]="selectedWoman()?.avatar" />
-                    </p>
+                         <div class="input-with-preview">
+                         <input #womanAvatar class="input-field" type="text"  [value]="selectedWoman()?.avatar"(input)="0" />
+                             <!-- Preview Icon -->
+                            <img [src]="womanAvatar.value" alt="Invalid" class="avatar-preview-icon" />
+                         </div>
+                   
                     }@else {
                         <p><strong>Avatar:</strong>
                         <img width="100%" height="100%" src='{{selectedWoman()?.avatar}}' alt="Avatar">
                     </p>
                     }
+                     @if (isEdit() == true){
+                        <p><strong>Age:</strong>
+                            <input #womanAge class="input-field" type="text"  [value]="selectedWoman()?.age" /></p>
+                     }@else {
+                        <p><strong>Age:</strong> {{ selectedWoman()?.age }}</p>
+                     }
+                    
+                    @if (isEdit() == true){
+                        <select #womanStatus 
+                                class="input-field" 
+                                id="status" 
+                                name="status" 
+                                [ngModel]="selectedWoman()?.status">
+                            <option value="" disabled selected>Select a status</option>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Widowed">Widowed</option>
+                            <option value="Separated">Separated</option>
+                            <option value="Common-Law / Domestic Partner">Common-Law / Domestic Partner</option>
+                        </select>
+                    }
+                    @else {
+                        <p><strong>Status:</strong> {{ selectedWoman()?.status }}</p>
+                    }
+                  
+                    @if (isEdit() == true){}
+                    @else {
+                        <p><strong>Date of Birth:</strong> {{ selectedWoman()?.dateOfBirth }}</p>}
+                    
+                    @if (isEdit() == true){}
+                    @else {
+                         <p><strong>Country:</strong> {{ selectedWoman()?.country }}</p>
+                        }
                    
-                    <p><strong>Age:</strong> {{ selectedWoman()?.age }}</p>
-                    <p><strong>Status:</strong> {{ selectedWoman()?.status }}</p>
-                    <p><strong>Date of Birth:</strong> {{ selectedWoman()?.dateOfBirth }}</p>
-                    <p><strong>Country:</strong> {{ selectedWoman()?.country }}</p>
-                    <p><strong>Race:</strong> {{ selectedWoman()?.race }}</p>
-                    <p><strong>Email:</strong> {{ selectedWoman()?.email }}</p>
+                    @if (isEdit() == true){}
+                    @else {
+                        <p><strong>Race:</strong> {{ selectedWoman()?.race }}</p>
+                    }
+                    
+                    @if (isEdit() == true){}
+                    @else {
+                        <p><strong>Email:</strong> {{ selectedWoman()?.email }}</p>
+                    }
+                    
 
             </div>
 
