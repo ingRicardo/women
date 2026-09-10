@@ -20,6 +20,16 @@ export class Womanmain implements OnInit{
 
   @ViewChild('womanAvatar') womanAvatarElement!: ElementRef<HTMLInputElement>;
   @ViewChild('womanStatus') womanStatusElement!: ElementRef<HTMLSelectElement>;
+  
+  @ViewChild('womanBirthday') womanBirthdayElement!: ElementRef<HTMLInputElement>;
+   
+  @ViewChild('womanCountry') womanCountryElement!: ElementRef<HTMLInputElement>;
+
+  @ViewChild('womanRace') womanRaceElement!: ElementRef<HTMLSelectElement>;
+  
+  @ViewChild('womanEmail') womanEmailElement!: ElementRef<HTMLInputElement>;
+  
+  @ViewChild('womanAge') womanAgeElement!: ElementRef<HTMLInputElement>;
 
   editWoman() {
    this.isEdit.set(true);
@@ -31,13 +41,45 @@ export class Womanmain implements OnInit{
   updateWoman(){
 
     if(this.womanNameElement && this.womanIdElement){
-      const inputNameValue = this.womanNameElement.nativeElement.value;
-      const womanIDValue = this.womanIdElement.nativeElement.value;
+      const womanNameValue = this.womanNameElement.nativeElement.value;
+      const womanIDValue = +this.womanIdElement.nativeElement.value;
       const womanAvatarValue = this.womanAvatarElement.nativeElement.value;
+      const womanAgeValue = +this.womanAgeElement.nativeElement.value;
       const womanStatusValue = this.womanStatusElement.nativeElement.value;
-       console.log(womanIDValue, inputNameValue, womanAvatarValue, womanStatusValue );
+      const womanBirthValue = this.womanBirthdayElement.nativeElement.value;
+      const womanCountryValue = this.womanCountryElement.nativeElement.value;
+      const womanRaceValue = this.womanRaceElement.nativeElement.value;
+      const womanEmailValue = this.womanEmailElement.nativeElement.value;
+     // console.log(womanIDValue, womanNameValue, womanAvatarValue, womanStatusValue, womanBirthValue, womanCountryValue, womanRaceValue, womanEmailValue, womanAgeValue);
+        const payload= {
+          id: womanIDValue,
+          name: womanNameValue, // Fallback to an empty string if null/undefined
+          avatar: womanAvatarValue ,
+          age: womanAgeValue,
+          status:womanStatusValue,
+          dateOfBirth: womanBirthValue,
+          country: womanCountryValue,
+          race: womanRaceValue,
+          email: womanEmailValue
+      };
+       console.log(payload);
+      this.womenService.updateWomanV1(womanIDValue, payload).subscribe({
+        next: (response) => {
+          console.log("women updated succesfully!", response);
+           this.showAlert("Woman updated successfully!", "success");
+           this.loadWomen();
+           this.isLoading.set(true);
+        },
+         error: (error) => {
+          this.loadWomen();
+          console.error('Update failed', error);
+          this.showAlert("Error updating profile. Please try again.", "error");
+         }
+      })
+    
     }
-
+      this.isLoading.set(false);
+      this.loadWomen();
   }
 
   openAdd() {
@@ -111,6 +153,7 @@ export class Womanmain implements OnInit{
             this.country.set('');
             this.race.set('');
             this.email.set('');
+          this.isEdit.set(false);
           this.loadWomen();
           this.isLoading.set(true);
 
@@ -122,6 +165,7 @@ export class Womanmain implements OnInit{
          }
       });
       this.isLoading.set(false);
+      this.isEdit.set(false);
       this.loadWomen();
  
    }
