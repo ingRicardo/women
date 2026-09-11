@@ -116,12 +116,12 @@ export class Womanmain implements OnInit {
           this.showAlert("Error updating profile. Please try again.", "error");
         }
       })
-
+      this.isLoading.set(false);
+      this.isEdit.set(false);
+      this.isWomanDisplayed.set(false);
+      this.loadWomen();
     }
-    this.isLoading.set(false);
-    this.isEdit.set(false);
-    this.isWomanDisplayed.set(false);
-    this.loadWomen();
+    this.showAlert("Error updating profile. Please try again.", "error");
   }
 
   openAdd() {
