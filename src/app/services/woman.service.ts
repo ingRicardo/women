@@ -68,7 +68,10 @@ export class WomanService {
       })
     );
   }
-
+  updateWomanV1(id: number, womanData: Woman): Observable<Woman>{
+    return this.http.put<Woman>(`${this.apiUrl}/${id}`, womanData);
+  }
+  
   deleteWoman(id: number): Observable<void> {
     // Optimistically remove from state
     this.deleteWomanLocally(id);

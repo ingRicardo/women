@@ -89,27 +89,135 @@
     @if(paginatedItems().length != 0) {
 
         
-        @if (selectedWoman() && isAddopen() == false) {
+        @if (selectedWoman() && isAddopen() == false && !isLoading() && isWomanDisplayed()) {
+           
             <div class="details">
+                 <div class="form-actions">
+                    <button class="add-btn" type="button" (click)="editWoman()">Edit</button>
+                </div>
                 <h3>Selected Woman Details:</h3>
-                <p><strong>ID:</strong> {{ selectedWoman()?.id }}</p>
-                <p><strong>Name:</strong> {{ selectedWoman()?.name }}</p>
-                <p><strong>Avatar:</strong>
-                    <img width="100%" height="100%" src='{{selectedWoman()?.avatar}}' alt="Avatar">
-                </p>
-                <p><strong>Age:</strong> {{ selectedWoman()?.age }}</p>
-                <p><strong>Status:</strong> {{ selectedWoman()?.status }}</p>
-                <p><strong>Date of Birth:</strong> {{ selectedWoman()?.dateOfBirth }}</p>
-                <p><strong>Country:</strong> {{ selectedWoman()?.country }}</p>
-                <p><strong>Race:</strong> {{ selectedWoman()?.race }}</p>
-                <p><strong>Email:</strong> {{ selectedWoman()?.email }}</p>
+                     @if(isEdit() == true){
+                       <p ><strong>ID:</strong> 
+                            <input  #womanId
+                            class="input-field" type="text" disabled [value]="selectedWoman()?.id || ''" /></p>
+                     }@else {
+                        <p ><strong>ID:</strong> {{ selectedWoman()?.id }}</p>
+                     }
 
+                    @if(isEdit() == true){
+                        <p><strong>Name:</strong> <input  #womanName
+                            class="input-field" type="text"  [value]="selectedWoman()?.name || ''" /></p>
+                    }@else {
+                        <p><strong>Name:</strong> {{ selectedWoman()?.name }}</p>
+                    }
+
+                    @if (isEdit() == true){
+                        <p><strong>Avatar:</strong> </p>
+                      <!--  <img width="100%" height="100%" src='{{selectedWoman()?.avatar}}' alt="Avatar">-->
+                         <div class="input-with-preview">
+                         <input #womanAvatar class="input-field" type="text"  [value]="selectedWoman()?.avatar"(input)="0" />
+                             <!-- Preview Icon -->
+                            <img [src]="womanAvatar.value" alt="Invalid" class="avatar-preview-icon" />
+                         </div>
+                   
+                    }@else {
+                        <p><strong>Avatar:</strong>
+                        <img width="100%" height="100%" src='{{selectedWoman()?.avatar}}' alt="Avatar">
+                    </p>
+                    }
+                     @if (isEdit() == true){
+                        <p><strong>Age:</strong>
+                            <input #womanAge class="input-field" type="number"  [value]="selectedWoman()?.age" /></p>
+                     }@else {
+                        <p><strong>Age:</strong> {{ selectedWoman()?.age }}</p>
+                     }
+                    
+                    @if (isEdit() == true){
+                        <p><strong>Status:</strong>
+                        <select #womanStatus 
+                                class="input-field" 
+                                id="status" 
+                                name="status" 
+                                [ngModel]="selectedWoman()?.status">
+                            <option value="" disabled selected>Select a status</option>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Widowed">Widowed</option>
+                            <option value="Separated">Separated</option>
+                            <option value="Common-Law / Domestic Partner">Common-Law / Domestic Partner</option>
+                        </select>
+                        </p>
+                    }
+                    @else {
+                        <p><strong>Status:</strong> {{ selectedWoman()?.status }}</p>
+                    }
+                  
+                    @if (isEdit() == true){
+                          <p><strong>Date of Birth:</strong>
+                            <input #womanBirthday class="input-field" type="date" [value]="selectedWoman()?.dateOfBirth"  />
+                          </p>
+                    }
+                    @else {
+                        <p><strong>Date of Birth:</strong> {{ selectedWoman()?.dateOfBirth }}</p>}
+                    
+                    @if (isEdit() == true){
+                        <p><strong>Country:</strong>  
+                         <input #womanCountry class="input-field" type="text" [value]="selectedWoman()?.country" />
+                        </p>
+                    }
+                    @else {
+                         <p><strong>Country:</strong> {{ selectedWoman()?.country }}</p>
+                        }
+                   
+                    @if (isEdit() == true){
+                         <p><strong>Race:</strong>  
+                            <select #womanRace
+                                class="input-field" 
+                                id="race" 
+                                name="race" 
+                                [ngModel]="selectedWoman()?.race">
+                            <option value="" disabled selected>Select race</option>
+                            <option value="Black">Black</option>
+                            <option value="Hispanic">Hispanic</option>
+                            <option value="Native">Native</option>
+                            <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+                            <option value="Asian">Asian</option>
+                            <option value="Black or African American">Black or African American</option>
+                            <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
+                            <option value="White">White</option>
+                            <option value="Two or More Races">Two or More Races</option>
+                            <option value="Other / Decline to State">Other / Decline to State</option>
+                        </select>
+                        </p>
+                    }
+                    @else {
+                        <p><strong>Race:</strong> {{ selectedWoman()?.race }}</p>
+                    }
+                    
+                    @if (isEdit() == true){
+                        <p><strong>Email:</strong>  
+                         <input #womanEmail class="input-field" type="email" [value]="selectedWoman()?.email" />
+                        </p>
+                    }
+                    @else {
+                        <p><strong>Email:</strong> {{ selectedWoman()?.email }}</p>
+                    }
+                    
+                 <div class="form-actions">
+                    @if(isEdit() == true){
+                        <button class="add-btn" type="button" (click)="updateWoman()">Update</button>
+                        <button class="add-btn" type="button" (click)="canceEditWoman()">Cancel</button>
+                    }
+                </div>
             </div>
 
         }
 
          @if(checkifloading()==false){
-            <div><button class="add-btn" type="button" (click)="openAdd()">Add</button></div>
+             @if(!isEdit()){
+                <div><button class="add-btn" type="button" (click)="openAdd()">Add</button></div>
+             }
          }
             @if (isAddopen()){
                 <div class="details">
