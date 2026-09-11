@@ -89,7 +89,7 @@
     @if(paginatedItems().length != 0) {
 
         
-        @if (selectedWoman() && isAddopen() == false) {
+        @if (selectedWoman() && isAddopen() == false && !isLoading() && isWomanDisplayed()) {
            
             <div class="details">
                  <div class="form-actions">
