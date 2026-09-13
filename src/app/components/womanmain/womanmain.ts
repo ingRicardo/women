@@ -104,7 +104,7 @@ export class Womanmain implements OnInit {
         const womanCountryValue = this.womanCountryElement.nativeElement.value;
         const womanRaceValue = this.womanRaceElement.nativeElement.value;
         const womanEmailValue = this.womanEmailElement.nativeElement.value;
-
+       
         const payload = {
           id: womanIDValue,
           name: womanNameValue, // Fallback to an empty string if null/undefined
@@ -147,14 +147,7 @@ export class Womanmain implements OnInit {
       this.saveWoman();
     }
   }
-/*
-  openAdd() {
-    this.isAddopen.set(true);
-  }
-  closeAdd() {
-    this.isAddopen.set(false);
-  }
-*/
+ 
   showAlert(message: string, type: 'success' | 'error') {
     this.alertMessage.set(message);
     this.alertType.set(type);
@@ -197,6 +190,8 @@ export class Womanmain implements OnInit {
       },
       error: (error) => {
         this.loadWomen();
+        this.isEdit.set(false);
+        this.isWomanDisplayed.set(false);
         console.error('Registration failed', error);
         this.showAlert("Error creating profile. Please try again.", "error");
       }
