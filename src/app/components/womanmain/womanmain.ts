@@ -67,6 +67,7 @@ export class Womanmain implements OnInit {
   canceEditWoman() {
     this.isEdit.set(false);
     this.isWomanDisplayed.set(false);
+    this.selectedRowId = null;
   }
 
   updateWoman() {
