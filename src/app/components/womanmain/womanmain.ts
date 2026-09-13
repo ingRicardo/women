@@ -48,6 +48,7 @@ export class Womanmain implements OnInit {
   totalPages = computed(() => Math.ceil(this.women().length / this.pageSize()));
 
   selectedWoman = signal<Woman | null>(null);
+  selectedRowId: number | null = null;
 
   ngOnInit(): void {
     this.loadWomen();
@@ -234,6 +235,7 @@ export class Womanmain implements OnInit {
   }
 
   onRowClick(rowData: Woman): void {
+    this.selectedRowId = rowData.id;
     this.isEdit.set(false);
     this.isWomanDisplayed.set(true);
     console.log('Row Data Captured:', rowData);
