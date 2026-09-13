@@ -90,24 +90,33 @@
     @if(paginatedItems().length != 0) {
 
         
-        @if (selectedWoman() && isAddopen() == false && !isLoading() && isWomanDisplayed()) {
+        @if (selectedWoman() && !isLoading() && isWomanDisplayed()) {
            
             <div class="details">
                  <div class="form-actions">
                     <button class="add-btn" type="button" (click)="editWoman()">Edit</button>
+                    <button class="add-btn" type="button" (click)="newWoman()">New</button>
+                    <button class="add-btn" type="button" (click)="updateWoman()">Update/Save</button>
+                    <button class="add-btn" type="button" (click)="canceEditWoman()">X</button>
                 </div>
                 <h3>Selected Woman Details:</h3>
                      @if(isEdit() == true){
                        <p ><strong>ID:</strong> 
                             <input  #womanId
                             class="input-field" type="text" disabled [value]="selectedWoman()?.id || ''" /></p>
-                     }@else {
+                     }@else if(isNew()){
+
+                    }@else {
                         <p ><strong>ID:</strong> {{ selectedWoman()?.id }}</p>
                      }
 
                     @if(isEdit() == true){
                         <p><strong>Name:</strong> <input  #womanName
                             class="input-field" type="text"  [value]="selectedWoman()?.name || ''" /></p>
+                     }@else if(isNew()){
+                         <p><strong>Name:</strong>
+                            <input class="input-field" type="text" id="name" name="name"  [(ngModel)]="name" />
+                        </p>
                     }@else {
                         <p><strong>Name:</strong> {{ selectedWoman()?.name }}</p>
                     }
@@ -120,7 +129,16 @@
                              <!-- Preview Icon -->
                             <img [src]="womanAvatar.value" alt="Invalid" class="avatar-preview-icon" />
                          </div>
-                   
+                     }@else if(isNew()){
+                          <p><strong>Avatar:</strong> </p>
+                            <div class="input-with-preview">
+                            <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" placeholder="https://colombiaone.com/wp-content/uploads/2025/05/gabriela-tafur-credit-paul-saad-CC-BY-NC-ND-2.0-flickr-1536x1024.jpg.webp"/>
+                            <!-- Preview Icon -->
+                            @if (avatar()) {
+                            <img [src]="avatar()" alt="Invalid" class="avatar-preview-icon" />
+                            }
+                            </div>
+                    
                     }@else {
                         <p><strong>Avatar:</strong>
                         <img width="100%" height="100%" src='{{selectedWoman()?.avatar}}' alt="Avatar">
@@ -129,26 +147,46 @@
                      @if (isEdit() == true){
                         <p><strong>Age:</strong>
                             <input #womanAge class="input-field" type="number"  [value]="selectedWoman()?.age" /></p>
-                     }@else {
+                      }@else if(isNew()){
+                         <p><strong>Age:</strong>
+                            <input class="input-field" type="number" id="age" name="age" [(ngModel)] ="age" />
+                         </p>
+                      }@else {
                         <p><strong>Age:</strong> {{ selectedWoman()?.age }}</p>
                      }
                     
                     @if (isEdit() == true){
-                        <p><strong>Status:</strong>
-                        <select #womanStatus 
-                                class="input-field" 
-                                id="status" 
-                                name="status" 
-                                [ngModel]="selectedWoman()?.status">
-                            <option value="" disabled selected>Select a status</option>
-                            <option value="Single">Single</option>
-                            <option value="Married">Married</option>
-                            <option value="Divorced">Divorced</option>
-                            <option value="Widowed">Widowed</option>
-                            <option value="Separated">Separated</option>
-                            <option value="Common-Law / Domestic Partner">Common-Law / Domestic Partner</option>
-                        </select>
-                        </p>
+                        <div>
+                            <p><strong>Status:</strong>
+                            <select #womanStatus 
+                                    class="input-field" 
+                                    id="status" 
+                                    name="status" 
+                                    [ngModel]="selectedWoman()?.status">
+                                <option value="" disabled selected>Select a status</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
+                                <option value="Separated">Separated</option>
+                                <option value="Common-Law / Domestic Partner">Common-Law / Domestic Partner</option>
+                            </select>
+                            </p>
+                        </div>
+                    }@else if(isNew()){
+                        <div> 
+                         <p><strong>Status:</strong>
+                            <select class="input-field" id="status" name="status" [(ngModel)]="status">
+                                <option value="" disabled selected>Select a status</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
+                                <option value="Separated">Separated</option>
+                                <option value="Common-Law / Domestic Partner">Common-Law / Domestic Partner</option>
+                            </select> 
+                         </p>
+                        </div>
                     }
                     @else {
                         <p><strong>Status:</strong> {{ selectedWoman()?.status }}</p>
@@ -158,39 +196,66 @@
                           <p><strong>Date of Birth:</strong>
                             <input #womanBirthday class="input-field" type="date" [value]="selectedWoman()?.dateOfBirth"  />
                           </p>
+                    } @else if(isNew()){
+                         <p><strong>Date of Birth:</strong>
+                            <input class="input-field" type="date" id="dateOfBirth" name="dateOfBirth"[(ngModel)] = "dateOfBirth" />
+                         </p>
                     }
                     @else {
                         <p><strong>Date of Birth:</strong> {{ selectedWoman()?.dateOfBirth }}</p>}
                     
                     @if (isEdit() == true){
                         <p><strong>Country:</strong>  
-                         <input #womanCountry class="input-field" type="text" [value]="selectedWoman()?.country" />
+                            <input #womanCountry class="input-field" type="text" [value]="selectedWoman()?.country" />
                         </p>
+                    }@else if(isNew()){
+                         <p><strong>Country:</strong>  
+                            <input class="input-field" type="text" id="country" name="country" [(ngModel)] ="country" />
+                         </p>
                     }
                     @else {
                          <p><strong>Country:</strong> {{ selectedWoman()?.country }}</p>
                         }
                    
                     @if (isEdit() == true){
-                         <p><strong>Race:</strong>  
-                            <select #womanRace
-                                class="input-field" 
-                                id="race" 
-                                name="race" 
-                                [ngModel]="selectedWoman()?.race">
-                            <option value="" disabled selected>Select race</option>
-                            <option value="Black">Black</option>
-                            <option value="Hispanic">Hispanic</option>
-                            <option value="Native">Native</option>
-                            <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
-                            <option value="Asian">Asian</option>
-                            <option value="Black or African American">Black or African American</option>
-                            <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
-                            <option value="White">White</option>
-                            <option value="Two or More Races">Two or More Races</option>
-                            <option value="Other / Decline to State">Other / Decline to State</option>
-                        </select>
-                        </p>
+                         <div>
+                            <p><strong>Race:</strong>  
+                                <select #womanRace
+                                    class="input-field" 
+                                    id="race" 
+                                    name="race" 
+                                    [ngModel]="selectedWoman()?.race">
+                                <option value="" disabled selected>Select race</option>
+                                <option value="Black">Black</option>
+                                <option value="Hispanic">Hispanic</option>
+                                <option value="Native">Native</option>
+                                <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+                                <option value="Asian">Asian</option>
+                                <option value="Black or African American">Black or African American</option>
+                                <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
+                                <option value="White">White</option>
+                                <option value="Two or More Races">Two or More Races</option>
+                                <option value="Other / Decline to State">Other / Decline to State</option>
+                            </select>
+                            </p>
+                        </div>
+                    }@else if(isNew()){
+                        <div> 
+                            <p><strong>Race:</strong>  
+                            <select class="input-field" id="race" name="race" [(ngModel)]="race">
+                                <option value="" disabled selected>Select race</option>
+                                <option value="Black">Black</option>
+                                <option value="Hispanic">Hispanic</option>
+                                <option value="Native">Native</option>
+                                <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+                                <option value="Asian">Asian</option>
+                                <option value="Black or African American">Black or African American</option>
+                                <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
+                                <option value="White">White</option>
+                                <option value="Two or More Races">Two or More Races</option>
+                                <option value="Other / Decline to State">Other / Decline to State</option>
+                            </select> 
+                        </div>
                     }
                     @else {
                         <p><strong>Race:</strong> {{ selectedWoman()?.race }}</p>
@@ -200,22 +265,19 @@
                         <p><strong>Email:</strong>  
                          <input #womanEmail class="input-field" type="email" [value]="selectedWoman()?.email" />
                         </p>
+                    }@else if(isNew()){
+                        <p><strong>Email:</strong>  
+                        <input class="input-field" type="email" id="email" name="email" [(ngModel)] = "email" />
+                        </p>
                     }
                     @else {
                         <p><strong>Email:</strong> {{ selectedWoman()?.email }}</p>
                     }
-                    
-                 <div class="form-actions">
-                    @if(isEdit() == true){
-                        <button class="add-btn" type="button" (click)="updateWoman()">Update</button>
-                        <button class="add-btn" type="button" (click)="canceEditWoman()">Cancel</button>
-                    }
-                </div>
             </div>
 
         }
 
-         @if(checkifloading()==false){
+   <!--       @if(checkifloading()==false){
              @if(!isEdit()){
                 <div><button class="add-btn" type="button" (click)="openAdd()">Add</button></div>
              }
@@ -233,7 +295,7 @@
                             <label for="avatar">Avatar URL:</label>
                             <div class="input-with-preview">
                             <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" placeholder="https://colombiaone.com/wp-content/uploads/2025/05/gabriela-tafur-credit-paul-saad-CC-BY-NC-ND-2.0-flickr-1536x1024.jpg.webp"/>
-                            <!-- Preview Icon -->
+                           
                             @if (avatar()) {
                             <img [src]="avatar()" alt="Invalid" class="avatar-preview-icon" />
                             }
@@ -291,7 +353,7 @@
                     </form>
                 </div>
             }
-        
+        -->
     }
 
     @if (alertMessage()) {

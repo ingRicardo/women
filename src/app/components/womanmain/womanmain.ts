@@ -27,7 +27,8 @@ export class Womanmain implements OnInit {
   private womenService = inject(WomanService);
   women = signal<Woman[]>([]);
   isLoading = signal<boolean>(false);
-  isAddopen = signal<boolean>(false);
+  //isAddopen = signal<boolean>(false);
+  isNew = signal<boolean>(false);
   isEdit = signal<boolean>(false);
   isWomanDisplayed = signal<boolean>(true);
   alertMessage = signal<string | null>(null);
@@ -60,79 +61,100 @@ export class Womanmain implements OnInit {
       this.isLoading.set(false);
     });
   }
-
+  newWoman() {
+    this.isNew.set(true);
+    this.isEdit.set(false);
+    this.name.set('');
+    this.avatar.set('');
+    this.age.set(0);
+    this.status.set('');
+    this.dateOfBirth.set('');
+    this.country.set('');
+    this.race.set('');
+    this.email.set('');
+  }
   editWoman() {
     this.isEdit.set(true);
+    this.isNew.set(false);
   }
   canceEditWoman() {
     this.isEdit.set(false);
+    this.isNew.set(false);
     this.isWomanDisplayed.set(false);
     this.selectedRowId = null;
   }
 
   updateWoman() {
+    console.log("update "+ this.isEdit());
+    console.log("new "+ this.isNew());
 
-    if (this.womanNameElement.nativeElement.value
-      && this.womanAvatarElement.nativeElement.value && +this.womanAgeElement.nativeElement.value > 0
-      && this.womanStatusElement.nativeElement.value && this.womanRaceElement.nativeElement.value
-      && this.womanBirthdayElement.nativeElement.value && this.womanCountryElement.nativeElement.value
-      && this.womanEmailElement.nativeElement.value
-    ) {
-      const womanNameValue = this.womanNameElement.nativeElement.value;
-      const womanIDValue = +this.womanIdElement.nativeElement.value;
-      const womanAvatarValue = this.womanAvatarElement.nativeElement.value;
-      const womanAgeValue = +this.womanAgeElement.nativeElement.value;
-      const womanStatusValue = this.womanStatusElement.nativeElement.value;
-      const womanBirthValue = this.womanBirthdayElement.nativeElement.value;
-      const womanCountryValue = this.womanCountryElement.nativeElement.value;
-      const womanRaceValue = this.womanRaceElement.nativeElement.value;
-      const womanEmailValue = this.womanEmailElement.nativeElement.value;
+    if(this.isEdit() == true){
+      if (this.womanNameElement.nativeElement.value
+        && this.womanAvatarElement.nativeElement.value && +this.womanAgeElement.nativeElement.value > 0
+        && this.womanStatusElement.nativeElement.value && this.womanRaceElement.nativeElement.value
+        && this.womanBirthdayElement.nativeElement.value && this.womanCountryElement.nativeElement.value
+        && this.womanEmailElement.nativeElement.value
+      ) {
+        const womanNameValue = this.womanNameElement.nativeElement.value;
+        const womanIDValue = +this.womanIdElement.nativeElement.value;
+        const womanAvatarValue = this.womanAvatarElement.nativeElement.value;
+        const womanAgeValue = +this.womanAgeElement.nativeElement.value;
+        const womanStatusValue = this.womanStatusElement.nativeElement.value;
+        const womanBirthValue = this.womanBirthdayElement.nativeElement.value;
+        const womanCountryValue = this.womanCountryElement.nativeElement.value;
+        const womanRaceValue = this.womanRaceElement.nativeElement.value;
+        const womanEmailValue = this.womanEmailElement.nativeElement.value;
 
-      const payload = {
-        id: womanIDValue,
-        name: womanNameValue, // Fallback to an empty string if null/undefined
-        avatar: womanAvatarValue,
-        age: womanAgeValue,
-        status: womanStatusValue,
-        dateOfBirth: womanBirthValue,
-        country: womanCountryValue,
-        race: womanRaceValue,
-        email: womanEmailValue
-      };
-      console.log(payload);
-      this.womenService.updateWomanV1(womanIDValue, payload).subscribe({
-        next: (response) => {
-          console.log("women updated succesfully!", response);
-          this.showAlert("Woman updated successfully!", "success");
-          this.loadWomen();
-          this.isLoading.set(true);
-          this.isEdit.set(false);
-          this.isWomanDisplayed.set(false);
+        const payload = {
+          id: womanIDValue,
+          name: womanNameValue, // Fallback to an empty string if null/undefined
+          avatar: womanAvatarValue,
+          age: womanAgeValue,
+          status: womanStatusValue,
+          dateOfBirth: womanBirthValue,
+          country: womanCountryValue,
+          race: womanRaceValue,
+          email: womanEmailValue
+        };
+        console.log(payload);
+        this.womenService.updateWomanV1(womanIDValue, payload).subscribe({
+          next: (response) => {
+            console.log("women updated succesfully!", response);
+            this.showAlert("Woman updated successfully!", "success");
+            this.loadWomen();
+            this.isLoading.set(true);
+            this.isEdit.set(false);
+            this.isWomanDisplayed.set(false);
 
-        },
-        error: (error) => {
-          this.loadWomen();
-          this.isEdit.set(false);
-          this.isWomanDisplayed.set(false);
-          console.error('Update failed', error);
-          this.showAlert("Error updating profile. Please try again.", "error");
-        }
-      })
-      this.isLoading.set(false);
-      this.isEdit.set(false);
-      this.isWomanDisplayed.set(false);
-      this.loadWomen();
-    }else
-      this.showAlert("Error updating profile. Please try again.", "error");
+          },
+          error: (error) => {
+            this.loadWomen();
+            this.isEdit.set(false);
+            this.isWomanDisplayed.set(false);
+            console.error('Update failed', error);
+            this.showAlert("Error updating profile. Please try again.", "error");
+          }
+        })
+        this.isLoading.set(false);
+        this.isEdit.set(false);
+        this.isWomanDisplayed.set(false);
+        this.loadWomen();
+      }else
+        this.showAlert("Error updating profile. Please try again.", "error");
+    }
+
+    if(this.isNew() == true){
+      this.saveWoman();
+    }
   }
-
+/*
   openAdd() {
     this.isAddopen.set(true);
   }
   closeAdd() {
     this.isAddopen.set(false);
   }
-
+*/
   showAlert(message: string, type: 'success' | 'error') {
     this.alertMessage.set(message);
     this.alertType.set(type);
@@ -185,12 +207,13 @@ export class Womanmain implements OnInit {
 
   }
   loadWomen() {
+    this.isWomanDisplayed.set(false);
     console.log('Fetching women data...');
     this.womenService.getWomenv1().subscribe({
       next: (data) => {
         this.women.set(data);
         console.log('Women data fetched:', this.women());
-
+        this.isLoading.set(true);
       },
       error: (err) => {
         console.error('Error fetching women:', err);
@@ -237,6 +260,7 @@ export class Womanmain implements OnInit {
 
   onRowClick(rowData: Woman): void {
     this.selectedRowId = rowData.id;
+    this.isNew.set(false);
     this.isEdit.set(false);
     this.isWomanDisplayed.set(true);
     console.log('Row Data Captured:', rowData);
