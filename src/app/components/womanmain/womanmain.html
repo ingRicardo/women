@@ -19,7 +19,8 @@
             </thead>
             <tbody>
                 @for (woman of paginatedItems(); track woman.id) {
-                <tr (click)="onRowClick(woman)">
+                <tr (click)="onRowClick(woman)"
+                    [class.active]="selectedRowId === woman.id">
                     <td>{{woman.id}}</td>
                     <td>{{woman.name}}</td>
                     @if(woman.avatar){

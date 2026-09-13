@@ -75,7 +75,9 @@ th {
 tr:hover {
   background-color: #0a0909;
 }
-
+tr.active {
+  background-color: #9e1d1d;
+}
  .pagination-controls {
   display: flex;
   align-items: center;
