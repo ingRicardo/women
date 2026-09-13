@@ -2,91 +2,101 @@
     <div class="toptitle">
         <h1>Welcome to the Women Inventory!</h1>
     </div>
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Avatar</th>
-                    <th>Age</th>
-                    <th>Status</th>
-                    <th>Date Of Birth</th>
-                    <th>Country</th>
-                    <th>Race</th>
-                    <th>E-mail</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (woman of paginatedItems(); track woman.id) {
-                <tr (click)="onRowClick(woman)"
-                    [class.active]="selectedRowId === woman.id">
-                    <td>{{woman.id}}</td>
-                    <td>{{woman.name}}</td>
-                    @if(woman.avatar){
-                    <td><img width="50" height="50" ngSrc='{{woman.avatar}}' alt="Avatar" class="avatar" priority></td>
-                    }@else {
-                        <td>No Image</td>
-                    }
-                    <td>{{woman.age}}</td>
-                    <td>{{woman.status}}</td>
-                    <td>{{woman.dateOfBirth }}</td>
-                    <td>{{woman.country}}</td>
-                    <td>{{woman.race}}</td>
-                    <td>{{woman.email}}</td>
-                </tr>
-                }@empty {
-                <tr>
-                    <td colspan="9" class="empty-table-message">No women found.</td>
-                </tr>
-                <tr>
-                    <td colspan="9" class="empty-table-messagev2">loading... </td>
-                </tr>
-                <tr>
-                    <td colspan="9">
-                        <div class="table-spinner-container">
-                            <div class="spinner"></div>
-                        </div>
+    @if(!isWomanDisplayed()){
+         @if(checkifloading()==true){
+            <div class="empty-table-messagev2">loading...</div>
+            <div class="table-spinner-container">
+                <div class="spinner"></div>
+            </div>
+         }
+         @else {
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Avatar</th>
+                            <th>Age</th>
+                            <th>Status</th>
+                            <th>Date Of Birth</th>
+                            <th>Country</th>
+                            <th>Race</th>
+                            <th>E-mail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (woman of paginatedItems(); track woman.id) {
+                        <tr (click)="onRowClick(woman)"
+                            [class.active]="selectedRowId === woman.id">
+                            <td>{{woman.id}}</td>
+                            <td>{{woman.name}}</td>
+                            @if(woman.avatar){
+                            <td><img width="50" height="50" ngSrc='{{woman.avatar}}' alt="Avatar" class="avatar" priority></td>
+                            }@else {
+                                <td>No Image</td>
+                            }
+                            <td>{{woman.age}}</td>
+                            <td>{{woman.status}}</td>
+                            <td>{{woman.dateOfBirth }}</td>
+                            <td>{{woman.country}}</td>
+                            <td>{{woman.race}}</td>
+                            <td>{{woman.email}}</td>
+                        </tr>
+                        }@empty {
+                        <tr>
+                            <td colspan="9" class="empty-table-message">No women found.</td>
+                        </tr>
+                        <tr>
+                            <td colspan="9" class="empty-table-messagev2">loading... </td>
+                        </tr>
+                        <tr>
+                            <td colspan="9">
+                                <div class="table-spinner-container">
+                                    <div class="spinner"></div>
+                                </div>
 
-                    </td>
-                </tr>
-                }
-                @if(checkifloading()==true){
-                <tr>
-                    <td colspan="9" class="empty-table-messagev2">loading... </td>
-                </tr>
-                <tr>
-                    <td colspan="9">
-                        <div class="table-spinner-container">
-                            <div class="spinner"></div>
-                        </div>
+                            </td>
+                        </tr>
+                        }
+                        @if(checkifloading()==true){
+                        <tr>
+                            <td colspan="9" class="empty-table-messagev2">loading... </td>
+                        </tr>
+                        <tr>
+                            <td colspan="9">
+                                <div class="table-spinner-container">
+                                    <div class="spinner"></div>
+                                </div>
 
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
-        <div class="pagination-controls">
-            <button class="pagination-btn" (click)="firstPage()" [disabled]="currentPage() === 1">
-                <<
-            </button>
-            <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage() === 1">
-                Previous
-            </button>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="pagination-controls">
+                    <button class="pagination-btn" (click)="firstPage()" [disabled]="currentPage() === 1">
+                        <<
+                    </button>
+                    <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage() === 1">
+                        Previous
+                    </button>
 
-            <span class="pagination-info">
-                Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong>
-            </span>
+                    <span class="pagination-info">
+                        Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong>
+                    </span>
 
-            <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage() === totalPages()">
-                Next
-            </button>
-            <button class="pagination-btn" (click)="lastPage()" [disabled]="currentPage() === totalPages()">
-                >>
-            </button>
-        </div>
+                    <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage() === totalPages()">
+                        Next
+                    </button>
+                    <button class="pagination-btn" (click)="lastPage()" [disabled]="currentPage() === totalPages()">
+                        >>
+                    </button>
+                </div>
 
-    </div>
+            </div>
+       }
+    }
     @if(paginatedItems().length != 0) {
 
         
@@ -96,7 +106,9 @@
                  <div class="form-actions">
                     <button class="add-btn" type="button" (click)="editWoman()">Edit</button>
                     <button class="add-btn" type="button" (click)="newWoman()">New</button>
-                    <button class="add-btn" type="button" (click)="updateWoman()">Update/Save</button>
+                    @if(isEdit() || isNew()){
+                        <button class="add-btn" type="button" (click)="updateWoman()">Update/Save</button>
+                    }
                     <button class="add-btn" type="button" (click)="canceEditWoman()">X</button>
                 </div>
                 <h3>Selected Woman Details:</h3>
@@ -277,83 +289,7 @@
 
         }
 
-   <!--       @if(checkifloading()==false){
-             @if(!isEdit()){
-                <div><button class="add-btn" type="button" (click)="openAdd()">Add</button></div>
-             }
-         }
-            @if (isAddopen()){
-                <div class="details">
-                    <form>
-                        <h3>Add Woman Form</h3>
-                        <div>
-                            <label for="name">Name:</label>
-                            <input class="input-field" type="text" id="name" name="name"  [(ngModel)]="name" />
-                        </div>
-                        <div>
-                            
-                            <label for="avatar">Avatar URL:</label>
-                            <div class="input-with-preview">
-                            <input class="input-field" type="text" id="avatar" name="avatar" [(ngModel)]="avatar" placeholder="https://colombiaone.com/wp-content/uploads/2025/05/gabriela-tafur-credit-paul-saad-CC-BY-NC-ND-2.0-flickr-1536x1024.jpg.webp"/>
-                           
-                            @if (avatar()) {
-                            <img [src]="avatar()" alt="Invalid" class="avatar-preview-icon" />
-                            }
-                            </div>
-                        </div>
-                        <div>
-                            <label for="age">Age:</label>
-                            <input class="input-field" type="number" id="age" name="age" [(ngModel)] ="age" />
-                        </div>
-                        <div> 
-                        <label for="status">Status:</label> 
-                            <select class="input-field" id="status" name="status" [(ngModel)]="status">
-                                <option value="" disabled selected>Select a status</option>
-                                <option value="Single">Single</option>
-                                <option value="Married">Married</option>
-                                <option value="Divorced">Divorced</option>
-                                <option value="Widowed">Widowed</option>
-                                <option value="Separated">Separated</option>
-                                <option value="Common-Law / Domestic Partner">Common-Law / Domestic Partner</option>
-                            </select> 
-                        </div>
-                        <div>
-                            <label for="dateOfBirth">Date of Birth:</label>
-                            <input class="input-field" type="date" id="dateOfBirth" name="dateOfBirth"[(ngModel)] = "dateOfBirth" />
-                        </div>
-                        <div>
-                            <label for="country">Country:</label>
-                            <input class="input-field" type="text" id="country" name="country" [(ngModel)] ="country" />
-                        </div>
-                        <div> 
-                            <label for="race">Race:</label> 
-                            <select class="input-field" id="race" name="race" [(ngModel)]="race">
-                                <option value="" disabled selected>Select race</option>
-                                <option value="Black">Black</option>
-                                <option value="Hispanic">Hispanic</option>
-                                <option value="Native">Native</option>
-                                <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
-                                <option value="Asian">Asian</option>
-                                <option value="Black or African American">Black or African American</option>
-                                <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
-                                <option value="White">White</option>
-                                <option value="Two or More Races">Two or More Races</option>
-                                <option value="Other / Decline to State">Other / Decline to State</option>
-                            </select> 
-                        </div>
-                        <div>
-                            <label for="email">Email:</label>
-                            <input class="input-field" type="email" id="email" name="email" [(ngModel)] = "email" />
-                        </div>
-
-                        <div class="form-actions">
-                            <button class="add-btn" type="button" (click) = "saveWoman()" >Save</button>
-                            <button class="add-btn" type="button" (click)= "closeAdd()">Close</button>
-                        </div>
-                    </form>
-                </div>
-            }
-        -->
+  
     }
 
     @if (alertMessage()) {
