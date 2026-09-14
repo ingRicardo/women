@@ -154,6 +154,22 @@ tr.active {
  .add-btn:hover {
   background-color: #1d4ed8;  
  }
+  .rate-btn{
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+ /* margin: 4px 2px; */
+  cursor: pointer;
+ }
+ .add-rate:hover {
+  background-color: #1d4ed8;  
+ }
 
  .input-field {
   width: 100%;
@@ -215,4 +231,84 @@ tr.active {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.parent-container {
+  display: flex;          
+  flex-direction: row;    
+  gap: 10px;              
+}
+
+
+/* Container that handles the custom dropdown arrow position */
+.custom-select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 200px; /* Adjust width as needed */
+}
+
+ .custom-select-wrapper select {
+  width: 100%;
+  padding: 10px 40px 10px 14px; /* Extra padding on right for custom arrow */
+  font-size: 16px;
+  font-family: inherit;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+  
+   -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+ .custom-select-wrapper select:hover {
+  border-color: #888888;
+}
+
+ .custom-select-wrapper select:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+}
+
+ .custom-select-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;  
+}
+
+
+ .rating-display {
+  display: inline-flex;
+  align-items: baseline; 
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  gap: 6px; /* Spacing between "Rate:" and the number */
+  margin: 10px 0;
+}
+
+ .rating-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #c6c0ec; 
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+ .rating-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #b0cf25;
+  line-height: 1;
 }
