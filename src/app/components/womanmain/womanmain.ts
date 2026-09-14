@@ -39,7 +39,7 @@ export class Womanmain implements OnInit {
   alertMessage = signal<string | null>(null);
   alertType = signal<'success' | 'error' | null>(null);
   isRateLoading = signal<boolean>(false);
-
+  showRate = signal<boolean>(false);
 
   name = model('');
   avatar = model('');
@@ -171,16 +171,22 @@ export class Womanmain implements OnInit {
     this.country.set('');
     this.race.set('');
     this.email.set('');
+    this.showRate.set(false);
+
   }
   editWoman() {
     this.isEdit.set(true);
     this.isNew.set(false);
+    this.showRate.set(false);
+
   }
   canceEditWoman() {
     this.isEdit.set(false);
     this.isNew.set(false);
     this.isWomanDisplayed.set(false);
     this.selectedRowId = null;
+    this.showRate.set(false);
+
   }
 
   updateWoman() {
@@ -361,6 +367,7 @@ export class Womanmain implements OnInit {
     this.selectedWoman.set(rowData); // Update the signal state
     console.log("should call woman rate --");
     //this.getWomanRate(rowData);
+    this.showRate.set(true);
   }
 
 

@@ -130,7 +130,8 @@
         }@else {
         <p><strong>Name:</strong> {{ selectedWoman()?.name }}</p>
         }
-        @if(womanRatesSignal().length > 0 || isRateLoading()==false || isLoading()==false ){
+        @if((womanRatesSignal().length > 0 || isRateLoading()==false || isLoading()==false)  ){
+            @if(showRate()){
             @for (woman of womanRatesSignal(); track woman.womanId) {
                 @if( selectedWoman()?.id == woman.womanId){
                 <div class="parent-container">
@@ -152,6 +153,7 @@
                 </div>
 
                 }
+            }
             }
         }@else {
         <div>
