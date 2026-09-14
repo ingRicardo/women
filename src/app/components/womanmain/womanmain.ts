@@ -1,8 +1,11 @@
 import { ChangeDetectorRef, Component, computed, effect, ElementRef, inject, model, OnInit, signal, ViewChild } from '@angular/core';
 import { WomanService } from '../../services/woman.service';
+import { WomanRatesService } from '../../services/woman-rates.service';
 import { Woman } from '../models/woman.model';
 import { NgOptimizedImage } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators, } from '@angular/forms';
+import { WomanRatingSummaryDto } from '../models/woman-rate.model';
+import { catchError, retry, throwError, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-womanmain',
@@ -25,6 +28,8 @@ export class Womanmain implements OnInit {
   @ViewChild('womanAge') womanAgeElement!: ElementRef<HTMLInputElement>;
 
   private womenService = inject(WomanService);
+  private womenRateService = inject(WomanRatesService);
+
   women = signal<Woman[]>([]);
   isLoading = signal<boolean>(false);
   //isAddopen = signal<boolean>(false);
@@ -53,13 +58,63 @@ export class Womanmain implements OnInit {
 
   ngOnInit(): void {
     this.loadWomen();
+    this.getAllWomanRates();
   }
   constructor() {
     effect(() => {
       const currentWomenList = this.women();
       console.log('The women list has changed!', currentWomenList);
       this.isLoading.set(false);
+      const womanRates = this.getAllWomanRates();
+      console.log('The Women Rates list has changed!', womanRates);
     });
+  }
+  /*
+  womanRate: number = 0;
+
+  getWomanRate(woman: Woman) {
+    // const womanId = this.selectedWoman()?.id; 
+
+    // if (womanId !== undefined) { 
+    console.log("womanId ====: ", woman.id);
+    if (woman.id === undefined) {
+      console.warn('Skipping service call because woman.id is undefined!');
+      return;
+    }
+
+    this.womenRateService.getAverageRateForWoman(woman.id).pipe(
+      retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
+      timeout(120000),                  // Increased to 120 seconds
+      catchError((err) => throwError(() => err))
+    ).subscribe({
+      next: (summary: WomanRatingSummaryDto) => {
+        console.log(summary);
+        // 2. Extract the numeric property from the DTO (e.g., summary.averageRate or summary.rate)
+        this.womanRate = summary.averageRate;
+        console.log(this.womanRate);
+      },
+      error: (err) => {
+        console.error('Error fetching woman rate:', err);
+      }
+    });
+    //} 
+  }*/
+  womanRatesSignal = signal<WomanRatingSummaryDto[]>([]);
+
+  getAllWomanRates() {
+    this.womenRateService.getAllAverageRates().pipe(
+      retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
+      timeout(120000),                  // Increased to 120 seconds
+      catchError((err) => throwError(() => err))
+    ).subscribe({
+      next: (response) => {
+        console.log("ALL woman rates response ", response);
+        this.womanRatesSignal.set(response);
+      }, error: (err) => {
+        console.error('Error fetching ALL woman rates:', err);
+      }
+    })
+
   }
   newWoman() {
     this.isNew.set(true);
@@ -85,10 +140,10 @@ export class Womanmain implements OnInit {
   }
 
   updateWoman() {
-    console.log("update "+ this.isEdit());
-    console.log("new "+ this.isNew());
+    console.log("update " + this.isEdit());
+    console.log("new " + this.isNew());
 
-    if(this.isEdit() == true){
+    if (this.isEdit() == true) {
       if (this.womanNameElement.nativeElement.value
         && this.womanAvatarElement.nativeElement.value && +this.womanAgeElement.nativeElement.value > 0
         && this.womanStatusElement.nativeElement.value && this.womanRaceElement.nativeElement.value
@@ -104,7 +159,7 @@ export class Womanmain implements OnInit {
         const womanCountryValue = this.womanCountryElement.nativeElement.value;
         const womanRaceValue = this.womanRaceElement.nativeElement.value;
         const womanEmailValue = this.womanEmailElement.nativeElement.value;
-       
+
         const payload = {
           id: womanIDValue,
           name: womanNameValue, // Fallback to an empty string if null/undefined
@@ -139,15 +194,15 @@ export class Womanmain implements OnInit {
         this.isEdit.set(false);
         this.isWomanDisplayed.set(false);
         this.loadWomen();
-      }else
+      } else
         this.showAlert("Error updating profile. Please try again.", "error");
     }
 
-    if(this.isNew() == true){
+    if (this.isNew() == true) {
       this.saveWoman();
     }
   }
- 
+
   showAlert(message: string, type: 'success' | 'error') {
     this.alertMessage.set(message);
     this.alertType.set(type);
@@ -260,6 +315,8 @@ export class Womanmain implements OnInit {
     this.isWomanDisplayed.set(true);
     console.log('Row Data Captured:', rowData);
     this.selectedWoman.set(rowData); // Update the signal state
+    console.log("should call woman rate --");
+    //this.getWomanRate(rowData);
   }
 
 

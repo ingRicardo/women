@@ -99,7 +99,7 @@
     }
     @if(paginatedItems().length != 0) {
 
-        
+
         @if (selectedWoman() && !isLoading() && isWomanDisplayed()) {
            
             <div class="details">
@@ -132,7 +132,12 @@
                     }@else {
                         <p><strong>Name:</strong> {{ selectedWoman()?.name }}</p>
                     }
-
+                        @for (woman of womanRatesSignal(); track woman.womanId) {
+                            @if( selectedWoman()?.id ==  woman.womanId){
+                                <p><strong>Rate:</strong>  {{ woman.averageRate }}</p>
+                            }
+                        
+                        }
                     @if (isEdit() == true){
                         <p><strong>Avatar:</strong> </p>
                       <!--  <img width="100%" height="100%" src='{{selectedWoman()?.avatar}}' alt="Avatar">-->
