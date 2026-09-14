@@ -38,6 +38,8 @@ export class Womanmain implements OnInit {
   isWomanDisplayed = signal<boolean>(true);
   alertMessage = signal<string | null>(null);
   alertType = signal<'success' | 'error' | null>(null);
+  isRateLoading = signal<boolean>(false);
+
 
   name = model('');
   avatar = model('');
@@ -50,7 +52,7 @@ export class Womanmain implements OnInit {
 
   currentPage = signal(1);
   pageSize = signal(5);
-
+  selectedRate = model(0);
   totalPages = computed(() => Math.ceil(this.women().length / this.pageSize()));
 
   selectedWoman = signal<Woman | null>(null);
@@ -67,6 +69,8 @@ export class Womanmain implements OnInit {
       this.isLoading.set(false);
       const womanRates = this.getAllWomanRates();
       console.log('The Women Rates list has changed!', womanRates);
+      this.isRateLoading.set(false);
+
     });
   }
   /*
@@ -102,6 +106,7 @@ export class Womanmain implements OnInit {
   womanRatesSignal = signal<WomanRatingSummaryDto[]>([]);
 
   getAllWomanRates() {
+    this.isRateLoading.set(true);
     this.womenRateService.getAllAverageRates().pipe(
       retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
       timeout(120000),                  // Increased to 120 seconds
@@ -109,13 +114,52 @@ export class Womanmain implements OnInit {
     ).subscribe({
       next: (response) => {
         console.log("ALL woman rates response ", response);
+        this.isRateLoading.set(true);
+
         this.womanRatesSignal.set(response);
       }, error: (err) => {
         console.error('Error fetching ALL woman rates:', err);
+        this.isRateLoading.set(true);
+
       }
     })
+      this.isRateLoading.set(false);
 
   }
+  rateList: number[] = Array.from({ length: 11 }, (_, i) => i);
+  
+  addRate(womanId : number){
+    console.log("add rate: ",this.selectedRate());
+    const dto = {
+      womanId: womanId,
+      rate: this.selectedRate(),
+    };
+    console.log(dto.rate, dto.womanId);
+      this.isRateLoading.set(true);
+      this.womenRateService.addRate(dto).pipe(
+      retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
+      timeout(120000),                  // Increased to 120 seconds
+      catchError((err) => throwError(() => err))
+    ).subscribe({
+      next: (response) => {
+        console.log("ADD woman rate response ", response);
+        //this.womanRatesSignal.set(response);
+        this.showAlert("Woman rate added successfully!", "success");
+        this.isRateLoading.set(false);
+      }, error: (err) => {
+        console.error('Error ADD woman rate:', err);
+        this.showAlert("Woman rate added successfully!", "success");
+        //this.getAllWomanRates();
+        this.isRateLoading.set(false);
+
+      }
+    });
+    this.selectedRate.set(0);
+    this.showAlert("Woman rate is being processing!", "success");
+    this.isRateLoading.set(true);
+    this.getAllWomanRates();
+
+   }
   newWoman() {
     this.isNew.set(true);
     this.isEdit.set(false);

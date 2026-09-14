@@ -26,7 +26,6 @@ export class WomanRatesService {
   getAverageRateForWoman(womanId: number): Observable<WomanRatingSummaryDto> {
     console.log("rate inside service ", womanId);
     console.log('Full SINGLE RATE request URL:', `${this.apiUrl}/average/${womanId}`);
-
     return this.http.get<WomanRatingSummaryDto>(`${this.apiUrl}/average/${womanId}`).pipe(
       tap({
       next: (data) => console.log('Rate data received by service:', data),
@@ -37,6 +36,12 @@ export class WomanRatesService {
 
   // POST: api/WomanRates
   addRate(dto: CreateRateDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}`, dto);
+    console.log('Full SINGLE RATE POST URL:', `${this.apiUrl}`);
+    return this.http.post(`${this.apiUrl}`, dto).pipe(
+      tap({
+      next: (data) => console.log('Rate data posted by service:', data),
+      error: (err) => console.error('Service error:', err)
+    })
+  );
   }
 }
