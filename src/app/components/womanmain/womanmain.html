@@ -104,9 +104,6 @@
         <div class="form-actions">
             <button class="add-btn" type="button" (click)="editWoman()">Edit</button>
             <button class="add-btn" type="button" (click)="newWoman()">New</button>
-            @if(isEdit() || isNew()){
-            <button class="add-btn" type="button" (click)="updateWoman()">Update/Save</button>
-            }
             <button class="add-btn" type="button" (click)="canceEditWoman()">X</button>
         </div>
         <h3>Selected Woman Details:</h3>
@@ -312,6 +309,11 @@
         @else {
         <p><strong>Email:</strong> {{ selectedWoman()?.email }}</p>
         }
+        <div class="form-actions">
+            @if(isEdit() || isNew()){
+            <button class="add-btn" type="button" (click)="updateWoman()">Update/Save</button>
+            }
+        </div>
     </div>
 
     }
