@@ -426,11 +426,50 @@ export class Womanmain implements OnInit {
     else return false;
   }
 
+  // 2. Query & Pagination State
+  searchQuery = signal<string>('');
+ // currentPage = signal<number>(1);
+ // pageSize = signal<number>(3); // Set low to easily demonstrate pagination transitions
+
+  // 3. Middle Tier: Compute the filtered subset before slicing into pages
+  filteredWomen = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    const rawList = this.women();
+
+    if (!query) return rawList;
+
+    return rawList.filter(woman =>
+      woman.name.toLowerCase().includes(query) ||
+      woman.email.toLowerCase().includes(query) ||
+      woman.status.toLowerCase().includes(query)
+    );
+  });
+
+  // 4. Top Tier: Slice the filtered subset for the view
   paginatedItems = computed(() => {
     const start = (this.currentPage() - 1) * this.pageSize();
     const end = start + this.pageSize();
-    return this.women().slice(start, end);
+    return this.filteredWomen().slice(start, end);
   });
+
+  // 5. Statistics Derived Signals
+  totalFilteredPages = computed(() => {
+    return Math.ceil(this.filteredWomen().length / this.pageSize()) || 1;
+  });
+
+  startIndex = computed(() => (this.currentPage() - 1) * this.pageSize() + 1);
+  endIndex = computed(() => {
+    const totalOnPage = this.currentPage() * this.pageSize();
+    const maxTotal = this.filteredWomen().length;
+    return totalOnPage > maxTotal ? maxTotal : totalOnPage;
+  });
+
+  // Helper method to reset page when text changes
+  onSearchChange(newQuery: string) {
+    this.searchQuery.set(newQuery);
+    this.currentPage.set(1); // Reset to page 1 to protect layout bounds
+  }
+
 
 
   nextPage() {

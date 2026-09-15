@@ -397,3 +397,56 @@ button[type="submit"]:hover {
 .actions button:active {
   transform: scale(0.97);     /* Slight bounce down effect */
 }
+
+.search-box input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+}
+.search-box input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+  color: #f5f7f9;
+  font-size: 14px;
+}
+
+.pagination-controls button {
+  padding: 8px 14px;
+  border: 1px solid #e2e8f0;
+  background-color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #334155;
+}
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+.pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  margin: 0 15px;
+}
+
+.no-data {
+  text-align: center;
+  color: #94a3b8;
+  padding: 40px 0;
+}
