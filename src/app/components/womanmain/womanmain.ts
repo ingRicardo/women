@@ -103,10 +103,34 @@ export class Womanmain implements OnInit {
     });
     //} 
   }*/
-  addnewWoman(){
 
+  onDateChange(dobString: string): void {
+    if (!dobString) {
+      this.age.set(0);
+      return;
+    }
+    this.age.set(this.calculateAge(dobString));
   }
+
+   private calculateAge(dobString: string): number {
+    const today = new Date();
+    const birthDate = new Date(dobString);
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    // If the current month is before the birth month, 
+    // or if it's the birth month but the current day is before the birth day,
+    // the user hasn't had their birthday yet this year.
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    return age;
+  }
+
   onSubmitWoman(dialog: HTMLDialogElement) {
+
     const payload: Omit<Woman, "id"> = {
       name: this.name(), // Fallback to an empty string if null/undefined
       avatar: this.avatar(),
@@ -143,6 +167,15 @@ export class Womanmain implements OnInit {
        // this.isWomanDisplayed.set(false);
         console.error('Registration failed', error);
         this.showAlert("Error creating profile. Please try again.", "error");
+        this.name.set('');
+        this.avatar.set('');
+        this.age.set(0);
+        this.status.set('');
+        this.dateOfBirth.set('');
+        this.country.set('');
+        this.race.set('');
+        this.email.set('');
+        this.isEdit.set(false);
       }
     });
     this.loadWomen();
@@ -196,7 +229,7 @@ export class Womanmain implements OnInit {
         this.isRateLoading.set(false);
       }, error: (err) => {
         console.error('Error ADD woman rate:', err);
-        this.showAlert("Woman rate added successfully!", "success");
+       // this.showAlert("Error adding rate. Please try again.", "error");
         //this.getAllWomanRates();
         this.isRateLoading.set(false);
 
