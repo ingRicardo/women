@@ -110,6 +110,14 @@
     }
     @else {
     <div class="table-container">
+          <div class="search-box">
+            <input 
+            type="text" 
+            [ngModel]="searchQuery()" 
+            (ngModelChange)="onSearchChange($event)" 
+            placeholder="Search records by name, email, or status..." 
+            />
+  </div>
         <table>
             <thead>
                 <tr>
@@ -172,24 +180,33 @@
                 }
             </tbody>
         </table>
-        <div class="pagination-controls">
-            <button class="pagination-btn" (click)="firstPage()" [disabled]="currentPage() === 1">
-                << </button>
-                    <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage() === 1">
-                        Previous
-                    </button>
+  <div class="table-footer">
+    <div class="records-info">
+      @if (filteredWomen().length > 0) {
+        Showing {{ startIndex() }} to {{ endIndex() }} of {{ filteredWomen().length }} entries
+      } @else {
+        Showing 0 to 0 of 0 entries
+      }
+    </div>
 
-                    <span class="pagination-info">
-                        Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong>
-                    </span>
-
-                    <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage() === totalPages()">
-                        Next
-                    </button>
-                    <button class="pagination-btn" (click)="lastPage()" [disabled]="currentPage() === totalPages()">
-                        >>
-                    </button>
-        </div>
+    <div class="pagination-controls">
+      <button 
+        [disabled]="currentPage() === 1" 
+        (click)="currentPage.set(currentPage() - 1)">
+        ◀
+      </button>
+      
+      <span class="page-indicator">
+        Page <strong>{{ currentPage() }}</strong> of {{ totalFilteredPages() }}
+      </span>
+      
+      <button 
+        [disabled]="currentPage() >= totalFilteredPages()" 
+        (click)="currentPage.set(currentPage() + 1)">
+         ▶
+      </button>
+    </div>
+  </div>
 
     </div>
     }
