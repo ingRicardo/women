@@ -6,10 +6,11 @@ import { NgOptimizedImage } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators, } from '@angular/forms';
 import { WomanRatingSummaryDto } from '../models/woman-rate.model';
 import { catchError, retry, throwError, timeout } from 'rxjs';
+import { Womancarousel, CarouselSlide } from '../womancarousel/womancarousel';
 
 @Component({
   selector: 'app-womanmain',
-  imports: [NgOptimizedImage, FormsModule],
+  imports: [NgOptimizedImage, FormsModule, Womancarousel],
   standalone: true,
   templateUrl: './womanmain.html',
   styleUrl: './womanmain.css',
@@ -73,6 +74,15 @@ export class Womanmain implements OnInit {
 
     });
   }
+  carouselSlides = computed<CarouselSlide[]>(() =>
+    this.women().map(woman => ({
+      image: woman.avatar ?? 'assets/default-avatar.png',
+      alt: woman.name,
+      name: woman.name
+    }))
+  );
+
+
   /*
   womanRate: number = 0;
 
