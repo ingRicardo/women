@@ -6,7 +6,16 @@
         <img  width="100%"  src="https://img.magnific.com/premium-photo/beautiful-young-women-group-against-beige-background_28914-56050.jpg?semt=ais_hybrid&w=740&q=80">
     </div>
     <p class="intro"> In this webiste you can admire the catalog of women we have , and rate them, also you can add your favorite woman</p>
-     @if(checkifloading()==false){
+
+    <main style="padding: 2rem;">
+      @if(paginatedItems().length != 0){
+        <h1 style="text-align: center;">Women Carousel</h1>
+      }
+      <app-womancarousel [slides]="carouselSlides()"></app-womancarousel>
+    </main>
+
+
+     @if(paginatedItems().length != 0){
     <div>
         <button type="button" class="add-btn" (click)="inputDialog.showModal()">Add Women</button>
     </div>
