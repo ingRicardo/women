@@ -50,6 +50,7 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 table {
@@ -311,4 +312,88 @@ tr.active {
   font-weight: 700;
   color: #b0cf25;
   line-height: 1;
+}
+.intro{
+
+  color: #eeeff3;
+  font-size: 1.1rem;
+  line-height: 1.5;
+
+}
+
+ .alert-dialog {
+  border: none;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 300px;
+}
+
+ .alert-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+/* Base style for both dialog buttons */
+.actions button {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* --- CANCEL BUTTON (Secondary Action) --- */
+button[type="button"] {
+  background-color: #ffffff;
+  color: #4b5563;            /* Slate gray */
+  border: 1px solid #d1d5db; /* Light gray outline */
+}
+
+button[type="button"]:hover {
+  background-color: #f9fafb; /* Subtle gray background on hover */
+  border-color: #9ca3af;     /* Darker border on hover */
+  color: #1f2937;
+}
+
+/* --- SUBMIT BUTTON (Primary Action) --- */
+button[type="submit"] {
+  background-color: #10b981; /* Fresh emerald green */
+  color: #ffffff;
+  border: 1px solid transparent;
+}
+
+button[type="submit"]:hover {
+  background-color: #059669; /* Richer green on hover */
+}
+
+/* Active click state for both buttons */
+.actions button:active {
+  transform: scale(0.97);     /* Slight bounce down effect */
 }

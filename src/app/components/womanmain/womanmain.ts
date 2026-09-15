@@ -103,10 +103,58 @@ export class Womanmain implements OnInit {
     });
     //} 
   }*/
+  addnewWoman(){
+
+  }
+  onSubmitWoman(dialog: HTMLDialogElement) {
+    const payload: Omit<Woman, "id"> = {
+      name: this.name(), // Fallback to an empty string if null/undefined
+      avatar: this.avatar(),
+      age: this.age(),
+      status: this.status(),
+      dateOfBirth: this.dateOfBirth(),
+      country: this.country(),
+      race: this.race(),
+      email: this.email()
+    };
+
+    console.log("payload", payload);
+    
+    this.womenService.createWomanv1(payload).subscribe({
+      next: (response) => {
+        console.log("women created succesfully!", response);
+        this.showAlert("Woman created successfully!", "success");
+        this.name.set('');
+        this.avatar.set('');
+        this.age.set(0);
+        this.status.set('');
+        this.dateOfBirth.set('');
+        this.country.set('');
+        this.race.set('');
+        this.email.set('');
+        this.isEdit.set(false);
+        this.loadWomen();
+        this.isLoading.set(true);
+
+      },
+      error: (error) => {
+        this.loadWomen();
+       // this.isEdit.set(false);
+       // this.isWomanDisplayed.set(false);
+        console.error('Registration failed', error);
+        this.showAlert("Error creating profile. Please try again.", "error");
+      }
+    });
+    this.loadWomen();
+
+    // Close the dialog after submission
+    dialog.close();
+  }
+
   womanRatesSignal = signal<WomanRatingSummaryDto[]>([]);
 
   getAllWomanRates() {
-    this.isRateLoading.set(true);
+    this.isRateLoading.set(false);
     this.womenRateService.getAllAverageRates().pipe(
       retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
       timeout(120000),                  // Increased to 120 seconds
@@ -114,12 +162,12 @@ export class Womanmain implements OnInit {
     ).subscribe({
       next: (response) => {
         console.log("ALL woman rates response ", response);
-        this.isRateLoading.set(true);
+        this.isRateLoading.set(false);
 
         this.womanRatesSignal.set(response);
       }, error: (err) => {
         console.error('Error fetching ALL woman rates:', err);
-        this.isRateLoading.set(true);
+        this.isRateLoading.set(false);
 
       }
     })
@@ -135,7 +183,7 @@ export class Womanmain implements OnInit {
       rate: this.selectedRate(),
     };
     console.log(dto.rate, dto.womanId);
-      this.isRateLoading.set(true);
+      this.isRateLoading.set(false);
       this.womenRateService.addRate(dto).pipe(
       retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
       timeout(120000),                  // Increased to 120 seconds
@@ -156,8 +204,8 @@ export class Womanmain implements OnInit {
     });
     this.selectedRate.set(0);
     this.showAlert("Woman rate is being processing!", "success");
-    this.isRateLoading.set(true);
-    this.getAllWomanRates();
+    this.isRateLoading.set(false);
+   // this.getAllWomanRates();
 
    }
   newWoman() {
@@ -186,6 +234,7 @@ export class Womanmain implements OnInit {
     this.isWomanDisplayed.set(false);
     this.selectedRowId = null;
     this.showRate.set(false);
+    this.isLoading.set(false);
 
   }
 
@@ -320,10 +369,16 @@ export class Womanmain implements OnInit {
       }
     });
     this.isLoading.set(false);
+    this.isRateLoading.set(false);
   }
 
   checkifloading() {
     if (this.isLoading())
+      return true;
+    else return false;
+  }
+  checkifrateloading() {
+    if (this.isRateLoading())
       return true;
     else return false;
   }
@@ -368,6 +423,8 @@ export class Womanmain implements OnInit {
     console.log("should call woman rate --");
     //this.getWomanRate(rowData);
     this.showRate.set(true);
+    this.isLoading.set(false);
+
   }
 
 
