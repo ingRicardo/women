@@ -85,6 +85,15 @@ export class Womanmain implements OnInit {
   ngAfterContentInit(){
  
   }
+
+   // Use signals for reactive state tracking
+  activeTab = signal<string>('home');
+
+  // Method to switch tabs
+  setTab(tabName: string): void {
+    this.activeTab.set(tabName);
+  }
+
   carouselSlides = computed<CarouselSlide[]>(() =>
     this.women().map(woman => ({
       image: woman.avatar ?? 'assets/default-avatar.png',
@@ -215,6 +224,12 @@ export class Womanmain implements OnInit {
   }
 
   womanRatesSignal = signal<WomanRatingSummaryDto[]>([]);
+
+  sortedWomanRates = computed(() => {
+    // The spread operator [...] copies the array so .sort() doesn't mutate the original
+    return [...this.womanRatesSignal()].sort((a, b) => b.averageRate - a.averageRate);
+  });
+
 
   getAllWomanRates() {
      this.womenRateService.getAllAverageRates().pipe(

@@ -486,3 +486,41 @@ button[type="submit"]:hover {
  }
 .btn-secondary { background-color: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
 .btn-confirm { background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+
+.tabs-container {
+  font-family: sans-serif;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.tab-headers {
+  display: flex;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tab-headers button {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+}
+
+.tab-headers button:hover {
+  color: #f7f1f1;
+}
+
+.tab-headers button.active {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+  font-weight: bold;
+}
+
+.tab-content {
+  padding: 20px 10px;
+}
+
