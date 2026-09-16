@@ -197,10 +197,10 @@ export class Womanmain implements OnInit {
   womanRatesSignal = signal<WomanRatingSummaryDto[]>([]);
 
   getAllWomanRates() {
-    this.isRateLoading.set(false);
+    //this.isRateLoading.set(false);
     this.womenRateService.getAllAverageRates().pipe(
-      retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
-      timeout(120000),                  // Increased to 120 seconds
+   //  retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
+   //   timeout(120000),                  // Increased to 120 seconds
       catchError((err) => throwError(() => err))
     ).subscribe({
       next: (response) => {
@@ -226,29 +226,31 @@ export class Womanmain implements OnInit {
       rate: this.selectedRate(),
     };
     console.log(dto.rate, dto.womanId);
-      this.isRateLoading.set(false);
+      this.isRateLoading.set(true);
+      //this.womanRatesSignal =signal<WomanRatingSummaryDto[]>([]);
       this.womenRateService.addRate(dto).pipe(
-      retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
-      timeout(120000),                  // Increased to 120 seconds
-      catchError((err) => throwError(() => err))
-    ).subscribe({
+       // retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
+     //   timeout(120000),                  // Increased to 120 seconds
+        catchError((err) => throwError(() => err))
+      ).subscribe({
       next: (response) => {
         console.log("ADD woman rate response ", response);
-        //this.womanRatesSignal.set(response);
+       // this.womanRatesSignal.set(response);
         this.showAlert("Woman rate added successfully!", "success");
-        this.isRateLoading.set(false);
+      //  this.isRateLoading.set(false);
+     //   this.getAllWomanRates();
       }, error: (err) => {
         console.error('Error ADD woman rate:', err);
        // this.showAlert("Error adding rate. Please try again.", "error");
         //this.getAllWomanRates();
-        this.isRateLoading.set(false);
-
+     //   this.isRateLoading.set(false);
+      //  this.getAllWomanRates();
       }
     });
     this.selectedRate.set(0);
     this.showAlert("Woman rate is being processing!", "success");
-    this.isRateLoading.set(false);
-   // this.getAllWomanRates();
+   // this.isRateLoading.set(false);
+    this.getAllWomanRates();
 
    }
   newWoman() {
