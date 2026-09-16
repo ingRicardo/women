@@ -245,35 +245,35 @@
         }
         @if((womanRatesSignal().length > 0 || isRateLoading()==false || isLoading()==false)  ){
             @if(showRate()){
-            @for (woman of womanRatesSignal(); track woman.womanId) {
-                @if( selectedWoman()?.id == woman.womanId){
-                    @if(isRateLoading() == false){
-                        <div class="parent-container">
-                            <div class="rating-display">
-                                <span class="rating-label">Rate:</span>
-                                <span class="rating-value">{{ woman.averageRate }}</span>
+            @if(womanRatesSignal().length > 0){
+                @for (woman of womanRatesSignal(); track woman.womanId) {
+                    @if( selectedWoman()?.id == woman.womanId){
+                            <div class="parent-container">
+                                <div class="rating-display">
+                                    <span class="rating-label">Rate:</span>
+                                    <span class="rating-value">{{ woman.averageRate }}</span>
+                                </div>
+                                <div class="custom-select-wrapper">
+                                    <select name="rates" id="rateselect" [(ngModel)]="selectedRate" >
+                                        <option value="" disabled selected>Select Rate</option>
+                                        @for (num of rateList; track num) {
+                                        <option [value]="num">{{ num }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div>
+                                    <button type="button" class="rate-btn" (click)="addRate(woman.womanId)">Rate</button>
+                                </div>
                             </div>
-                            <div class="custom-select-wrapper">
-                                <select name="rates" id="rateselect" [(ngModel)]="selectedRate">
-                                    <option value="" disabled selected>Select Rate</option>
-                                    @for (num of rateList; track num) {
-                                    <option [value]="num">{{ num }}</option>
-                                    }
-                                </select>
-                            </div>
-                            <div>
-                                <button type="button" class="rate-btn" (click)="addRate(woman.womanId)">Rate</button>
-                            </div>
-                        </div>
-                    }@else {
+                        }
+                    }
+                }@else {
                         <div class="table-spinner-container">
                             <div class="spinner"></div> 
                             <p> loading rate...</p>                     
                         </div>
                          
                     }
-                }
-            }
             }
         }@else {
         <div>
