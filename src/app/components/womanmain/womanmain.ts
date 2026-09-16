@@ -51,6 +51,8 @@ export class Womanmain implements OnInit {
   race = model('');
   email = model('');
 
+  password = model();
+
   currentPage = signal(1);
   pageSize = signal(5);
   selectedRate = model(0);
@@ -285,7 +287,41 @@ export class Womanmain implements OnInit {
     this.isLoading.set(false);
 
   }
+  
+  deleteRecord(): void {
+    console.log("password ", this.password());
+    console.log('Record id:', this.selectedWoman()?.id);
+    console.log('Record name:', this.selectedWoman()?.name);
+    if(this.password() == "Borias"){
+     // console.log('Record deleted successfully.', this.selectedWoman()?.id);
+     // console.log('Record deleted:', this.selectedWoman()?.name);
+      console.log("password is correct! ");
+      const womanId = this.selectedWoman()?.id; 
 
+      if (womanId=== undefined) {
+        console.warn('Skipping service call because woman.id is undefined!');
+        return;
+      }else{
+          this.womenService.deleteWomanV1(womanId).subscribe({
+            next: (response) => {
+              console.log("Record deleted successfully.", response);
+              this.showAlert("Record deleted successfully.!", "success");
+              this.loadWomen();
+              this.isLoading.set(true);
+            },
+            error: (error) => {
+              console.error('Deletion failed', error);
+              this.loadWomen();
+              this.isEdit.set(false);
+              this.showAlert("Error deleting profile. Please try again.", "error");
+            }
+          });
+          this.showAlert("Record is being deleted.!", "success");
+          this.isLoading.set(false);
+          this.loadWomen();
+      }
+    }
+  }
   updateWoman() {
     console.log("update " + this.isEdit());
     console.log("new " + this.isNew());

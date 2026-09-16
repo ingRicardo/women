@@ -215,11 +215,28 @@
 
     @if (selectedWoman() && !isLoading() && isWomanDisplayed()) {
 
+     
+    <dialog #confirmModal class="custom-modal">
+    <h3>Confirm Deletion</h3>
+    <p>Are you sure you want to delete <strong>{{ selectedWoman()?.name }}</strong>?</p>
+    <label>Password:</label>
+    <input class="input-field" type="password" id="password" name="password" [(ngModel)]="password" />
+    <div class="modal-actions">
+        <!-- 3. Action buttons -->
+        <button (click)="confirmModal.close()" class="btn-secondary">Cancel</button>
+        <button (click)="deleteRecord(); confirmModal.close()" class="btn-confirm">Delete</button>
+    </div>
+    </dialog>
+
     <div class="details">
         <div class="form-actions">
             <button class="add-btn" type="button" (click)="editWoman()">Edit</button>
             <!--<button class="add-btn" type="button" (click)="newWoman()">New</button> -->
-            <button class="add-btn" type="button" (click)="canceEditWoman()">X</button>
+            @if(!isEdit()){
+               <!--  <button class="del-btn" type="button" (click)="onDelete()" >Delete </button>-->
+                <button (click)="confirmModal.showModal()" class="btn-danger">Delete</button>
+            }
+            <button class="add-btn" type="button" (click)="canceEditWoman()">Close</button>
         </div>
         <h3>Selected Woman Details:</h3>
         @if(isEdit() == true){
