@@ -56,7 +56,7 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px;
+ /* min-width: 600px; */
   font-family: Arial, sans-serif;
 }
 
@@ -489,8 +489,8 @@ button[type="submit"]:hover {
 
 .tabs-container {
   font-family: sans-serif;
-  max-width: 600px;
-  margin: 20px auto;
+ /* max-width: 600px; */
+ /* margin: 20px auto; */
 }
 
 .tab-headers {
@@ -520,7 +520,4 @@ button[type="submit"]:hover {
   font-weight: bold;
 }
 
-.tab-content {
-  padding: 20px 10px;
-}
-
+ 
