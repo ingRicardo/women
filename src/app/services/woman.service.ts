@@ -86,7 +86,10 @@ export class WomanService {
       })
     );
   }
-
+  deleteWomanV1(id: number): Observable<void> {
+     
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
   // --- Local Signal Mutators ---
 
   addWomanLocally(newWoman: Woman): void {
