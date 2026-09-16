@@ -124,11 +124,19 @@ export class Womanmain implements OnInit {
   }*/
 
   onDateChange(dobString: string): void {
+    console.log("edit date ", dobString , " is edit : ", this.isEdit());
     if (!dobString) {
-      this.age.set(0);
+      if(this.isEdit()){
+          this.womanAgeElement.nativeElement.value = "";
+      }else
+        this.age.set(0);
+        
       return;
     }
-    this.age.set(this.calculateAge(dobString));
+    if(this.isEdit()){
+       this.womanAgeElement.nativeElement.value = this.calculateAge(dobString).toString();
+    }else
+      this.age.set(this.calculateAge(dobString));
   }
 
    private calculateAge(dobString: string): number {
@@ -177,6 +185,7 @@ export class Womanmain implements OnInit {
         this.email.set('');
         this.isEdit.set(false);
         this.loadWomen();
+        this.getAllWomanRates();
         this.isLoading.set(true);
 
       },

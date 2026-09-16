@@ -15,7 +15,7 @@
     </main>
 
 
-     @if(paginatedItems().length != 0){
+     @if(paginatedItems().length != 0 && !checkifloading()){
     <div>
         <button type="button" class="add-btn" (click)="inputDialog.showModal()">Add Women</button>
     </div>
@@ -107,8 +107,7 @@
     <div class="table-spinner-container">
         <div class="spinner"></div>
     </div>
-    }
-    @else {
+    }@else {
     <div class="table-container">
           <div class="search-box">
             <input 
@@ -117,7 +116,7 @@
             (ngModelChange)="onSearchChange($event)" 
             placeholder="Search records by name, email, or status..." 
             />
-  </div>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -301,7 +300,7 @@
         }
         @if (isEdit() == true){
         <p><strong>Age:</strong>
-            <input #womanAge class="input-field" type="number" [value]="selectedWoman()?.age" />
+            <input #womanAge class="input-field" type="number" [value]="selectedWoman()?.age" disabled/>
         </p>
         }@else if(isNew()){
         <p><strong>Age:</strong>
@@ -346,7 +345,8 @@
 
         @if (isEdit() == true){
         <p><strong>Date of Birth:</strong>
-            <input #womanBirthday class="input-field" type="date" [value]="selectedWoman()?.dateOfBirth" />
+            <!-- <input class="input-field" type="date" id="dateOfBirth" name="dateOfBirth" [(ngModel)]="dateOfBirth"  (ngModelChange)="onDateChange($event)"/>-->
+            <input #womanBirthday class="input-field" type="date" [value]="selectedWoman()?.dateOfBirth"  (change)="onDateChange($any($event.target).value)" />
         </p>
         } @else if(isNew()){
         <p><strong>Date of Birth:</strong>
