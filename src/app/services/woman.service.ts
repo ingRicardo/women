@@ -100,23 +100,23 @@ export class WomanService {
   // --- Rating Operations ---
 
   addRating(dto: CreateRateDto): Observable<void> {
-    return this.http.post<void>(this.rateApiUrl, dto).pipe(
+    return this.http.post<void>(this.rateApiUrl, dto); /*.pipe(
       retry({ count: 2, delay: 2000 }),
       timeout(30000)
-    );
+    ); */
   }
 
   getAverageRating(womanId: number): Observable<WomanRatingSummary> {
-    return this.http.get<WomanRatingSummary>(`${this.rateApiUrl}/average/${womanId}`).pipe(
+    return this.http.get<WomanRatingSummary>(`${this.rateApiUrl}/average/${womanId}`);/*.pipe(
       retry({ count: 2, delay: 2000 }),
       timeout(30000)
-    );
+    );*/
   }
 
   getAllAverageRatings(): Observable<WomanRatingSummary[]> {
-    return this.http.get<WomanRatingSummary[]>(`${this.rateApiUrl}/averages`).pipe(
+    return this.http.get<WomanRatingSummary[]>(`${this.rateApiUrl}/averages`);/*.pipe(
       retry({ count: 3, delay: 3000 }),
-      timeout(60000)
-    );
+      timeout(60000) 
+    );*/
   }
 }

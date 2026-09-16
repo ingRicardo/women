@@ -68,11 +68,20 @@ export class Womanmain implements OnInit {
       const currentWomenList = this.women();
       console.log('The women list has changed!', currentWomenList);
       this.isLoading.set(false);
-      const womanRates = this.getAllWomanRates();
+      const womanRates = this.womanRatesSignal();
       console.log('The Women Rates list has changed!', womanRates);
       this.isRateLoading.set(false);
 
     });
+  }
+  ngOnChanges(){
+
+  }
+  ngDoCheck(){
+    console.log("isRateLoading : ",this.isRateLoading());
+  }
+  ngAfterContentInit(){
+ 
   }
   carouselSlides = computed<CarouselSlide[]>(() =>
     this.women().map(woman => ({
@@ -197,24 +206,18 @@ export class Womanmain implements OnInit {
   womanRatesSignal = signal<WomanRatingSummaryDto[]>([]);
 
   getAllWomanRates() {
-    //this.isRateLoading.set(false);
-    this.womenRateService.getAllAverageRates().pipe(
+     this.womenRateService.getAllAverageRates().pipe(
    //  retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
    //   timeout(120000),                  // Increased to 120 seconds
       catchError((err) => throwError(() => err))
     ).subscribe({
       next: (response) => {
         console.log("ALL woman rates response ", response);
-        this.isRateLoading.set(false);
-
         this.womanRatesSignal.set(response);
       }, error: (err) => {
         console.error('Error fetching ALL woman rates:', err);
-        this.isRateLoading.set(false);
-
       }
     })
-      this.isRateLoading.set(false);
 
   }
   rateList: number[] = Array.from({ length: 11 }, (_, i) => i);
@@ -227,7 +230,6 @@ export class Womanmain implements OnInit {
     };
     console.log(dto.rate, dto.womanId);
       this.isRateLoading.set(true);
-      //this.womanRatesSignal =signal<WomanRatingSummaryDto[]>([]);
       this.womenRateService.addRate(dto).pipe(
        // retry({ count: 1, delay: 2000 }), // Reduced retries so you don't wait forever while debugging
      //   timeout(120000),                  // Increased to 120 seconds
@@ -235,21 +237,13 @@ export class Womanmain implements OnInit {
       ).subscribe({
       next: (response) => {
         console.log("ADD woman rate response ", response);
-       // this.womanRatesSignal.set(response);
         this.showAlert("Woman rate added successfully!", "success");
-      //  this.isRateLoading.set(false);
-     //   this.getAllWomanRates();
       }, error: (err) => {
         console.error('Error ADD woman rate:', err);
-       // this.showAlert("Error adding rate. Please try again.", "error");
-        //this.getAllWomanRates();
-     //   this.isRateLoading.set(false);
-      //  this.getAllWomanRates();
       }
     });
     this.selectedRate.set(0);
     this.showAlert("Woman rate is being processing!", "success");
-   // this.isRateLoading.set(false);
     this.getAllWomanRates();
 
    }
@@ -430,10 +424,7 @@ export class Womanmain implements OnInit {
 
   // 2. Query & Pagination State
   searchQuery = signal<string>('');
- // currentPage = signal<number>(1);
- // pageSize = signal<number>(3); // Set low to easily demonstrate pagination transitions
 
-  // 3. Middle Tier: Compute the filtered subset before slicing into pages
   filteredWomen = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     const rawList = this.women();
@@ -505,7 +496,6 @@ export class Womanmain implements OnInit {
     console.log('Row Data Captured:', rowData);
     this.selectedWoman.set(rowData); // Update the signal state
     console.log("should call woman rate --");
-    //this.getWomanRate(rowData);
     this.showRate.set(true);
     this.isLoading.set(false);
 
